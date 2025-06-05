@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %} Cyber Dungeon - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+  <!-- HERO SECTION -->
+  <section class="px-6 py-20 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold text-green-400 mb-4">⚡ Cyber Dungeon</h1>
+    <p class="text-gray-300 max-w-2xl mx-auto text-lg mb-6">
+      Esplora mondi oscuri, combatti entità biomeccaniche, sopravvivi nei labirinti infiniti.
+    </p>
+<!-- CALLOUT -->
+<div class="bg-gray-800 text-green-400 px-6 py-4 rounded-lg border border-green-700 shadow mb-6 max-w-xl mx-auto">
+  {{ callout_text }}
+</div>
+
+  {% if request.user.is_authenticated %}
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded shadow transition">
+        Logout
+      </button>
+    </form>
+    {% else %}
+<!-- CTA Buttons -->
+<div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+  <a href="/accounts/register" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">
+    Registrati Ora
+  </a>
+  <a href="{% url 'login' %}" class="inline-block bg-gray-700 hover:bg-gray-800 text-white font-bold px-6 py-3 rounded shadow transition">
+    Login
+  </a>
+</div>
+
+<!-- SOTTO-TESTO -->
+<p class="text-sm text-gray-400 mt-4">
+  Nessun account? Nessun problema. Unisciti alla Resistenza.
+</p>
+{% endif %}
+  </section>
+
+  <!-- GAME GRID SECTION -->
+  <section class="px-6 py-12 max-w-7xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-200 mb-8">🎮 I Nostri Giochi</h2>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Card 1 -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+        <h3 class="text-xl font-bold text-green-400 mb-2">💀 Blam Punk</h3>
+        <p class="text-gray-300 text-sm mb-4">Un'avventura AI immersiva nello stile cyber-distopico di Nihei. Sopravvivi o impazzisci.</p>
+        <a href="/blampunk/chatdark" class="text-sm text-green-400 hover:underline">Avvia Partita</a>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+        <h3 class="text-xl font-bold text-gray-400 mb-2">In arrivo</h3>
+        <p class="text-gray-300 text-sm mb-4">Prossimamente nuovi mondi da esplorare.</p>
+        <span class="text-sm text-gray-500 italic">Coming soon...</span>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+        <h3 class="text-xl font-bold text-gray-400 mb-2">In arrivo</h3>
+        <p class="text-gray-300 text-sm mb-4">Nuove avventure, nuove AI, stesso stile letale.</p>
+        <span class="text-sm text-gray-500 italic">Coming soon...</span>
+      </div>
+
+      <!-- Row 2 - Card 4 -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+        <h3 class="text-xl font-bold text-gray-400 mb-2">In arrivo</h3>
+        <p class="text-gray-300 text-sm mb-4">Nuovo scenario in preparazione.</p>
+        <span class="text-sm text-gray-500 italic">Coming soon...</span>
+      </div>
+
+      <!-- Row 2 - Card 5 -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+        <h3 class="text-xl font-bold text-gray-400 mb-2">In arrivo</h3>
+        <p class="text-gray-300 text-sm mb-4">Restate sintonizzati per nuovi contenuti AI-driven.</p>
+        <span class="text-sm text-gray-500 italic">Coming soon...</span>
+      </div>
+
+      <!-- Row 2 - Card 6 -->
+      <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md hover:shadow-lg transition">
+        <h3 class="text-xl font-bold text-gray-400 mb-2">In arrivo</h3>
+        <p class="text-gray-300 text-sm mb-4">Il prossimo titolo sarà ancora più immersivo.</p>
+        <span class="text-sm text-gray-500 italic">Coming soon...</span>
+      </div>
+    </div>
+  </section>
+
+
+
+{% endblock %}
+

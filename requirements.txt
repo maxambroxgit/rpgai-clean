@@ -1,0 +1,6 @@
+Django>=5.2
+django-registration>=3.3
+django-tailwind>=3.6.0
+widget-tweaks>=1.4.8
+requests>=2.31
+

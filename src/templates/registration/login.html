@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-950 px-4">
+  <div class="w-full max-w-md bg-gray-900 text-white p-8 rounded-lg shadow-lg border border-green-700">
+
+    <h2 class="text-2xl font-bold mb-6 text-center">Accedi al tuo account</h2>
+
+    {% if form.errors %}
+      <div class="bg-red-500 text-white text-sm px-4 py-3 rounded mb-4">
+        ⚠️ Username e password non corrispondono. Riprova.
+      </div>
+    {% endif %}
+
+    {% if next %}
+      {% if user.is_authenticated %}
+        <p class="text-sm text-yellow-400 mb-4">Il tuo account non ha accesso a questa pagina.</p>
+      {% else %}
+        <p class="text-sm text-gray-400 mb-4">Effettua il login per visualizzare questa pagina.</p>
+      {% endif %}
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium mb-1">Username</label>
+        {{ form.username|add_class:"w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-green-500" }}
+      </div>
+
+      <div>
+        <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium mb-1">Password</label>
+        {{ form.password|add_class:"w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-green-500" }}
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+        Login
+      </button>
+    </form>
+
+    <div class="mt-6 text-sm text-center">
+      <a href="{% url 'password_reset' %}" class="text-green-400 hover:underline">Password dimenticata?</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-950 px-4">
+  <div class="bg-gray-900 text-white p-8 rounded-lg shadow-lg border border-green-700 max-w-md text-center">
+
+    <h2 class="text-2xl font-bold text-green-400 mb-4">✅ Registrazione completata</h2>
+    <p class="text-gray-300 mb-6">
+      Grazie per esserti registrato! Controlla la tua email per attivare il tuo account.
+    </p>
+
+    <a href="{% url 'home:home' %}" class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition">
+      Torna alla Home
+    </a>
+
+  </div>
+</div>
+{% endblock %}

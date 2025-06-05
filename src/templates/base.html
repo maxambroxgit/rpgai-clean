@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+{% load tz %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>{% block title %}RPG AI{% endblock %}</title>
+</head>
+
+<body class="bg-gray-900 text-gray-100 font-mono min-h-screen py-8 flex flex-col justify-between">
+
+  <main class="flex-grow">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center py-6 text-gray-500 text-sm">
+    <p>© RPG AI {% now "Y" %} – Tutti i diritti riservati – 
+      <a href="{% url 'privacy' %}" class="text-green-400 hover:underline">Privacy Policy</a>
+    </p>
+  </footer>
+
+</body>
+</html>
