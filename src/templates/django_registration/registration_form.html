@@ -1,26 +1,48 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 
 {% block content %}
-<form method="post" class="space-y-5">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
+<div class="min-h-screen flex items-center justify-center bg-gray-950 px-4">
+  <div class="w-full max-w-md bg-gray-900 text-white p-8 rounded-lg shadow-lg border border-green-700">
 
-  {% for field in form %}
-    <div>
-      <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
-        {{ field.label }}
-      </label>
+    <h2 class="text-xl font-bold text-green-400 mb-6 text-center">🧍‍♂️ Crea un nuovo account</h2>
 
-      {% if field.errors %}
-        <p class="text-red-400 text-sm mb-1">{{ field.errors.0 }}</p>
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+      
+      {% for field in form %}
+        {% if field.name != 'privacy' %}
+          <div>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+              {{ field.label }}
+            </label>
+            {% if field.errors %}
+              <p class="text-red-400 text-sm mb-1">{{ field.errors.0 }}</p>
+            {% endif %}
+            {{ field|add_class:"w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500" }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Checkbox Privacy -->
+      <div class="flex items-start text-sm text-gray-300">
+        <input type="checkbox" id="privacy" name="privacy" class="mt-1 mr-2 text-green-600 focus:ring-green-500 border-gray-300 rounded" {% if form.privacy.value %}checked{% endif %}>
+        <label for="privacy">
+          Accetto l'<a href="{% url 'privacy' %}" class="underline text-green-400 hover:text-green-300 transition">informativa sulla privacy</a>
+        </label>
+      </div>
+      {% if form.privacy.errors %}
+        <p class="text-red-400 text-sm mt-1">{{ form.privacy.errors.0 }}</p>
       {% endif %}
 
-      {{ field }}
-    </div>
-  {% endfor %}
+      <!-- Submit -->
+      <div>
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition">
+          Registra un nuovo account
+        </button>
+      </div>
+    </form>
 
-  <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition">
-    Registra un nuovo account
-  </button>
-</form>
+  </div>
+</div>
 {% endblock %}
