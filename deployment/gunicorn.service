@@ -8,8 +8,8 @@ After=network.target
 [Service]
 User=rpgai
 Group=www-data
-WorkingDirectory=/home/rpgai/cyber_dungeon/src
-ExecStart=/home/rpgai/cyber_dungeon/venv/bin/gunicorn \
+WorkingDirectory=/home/rpgai/rpgai-clean/src
+ExecStart=/home/rpgai/rpg-clean/env/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \

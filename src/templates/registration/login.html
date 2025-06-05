@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load widget_tweaks %}
 
 {% block content %}
 <div class="min-h-screen flex items-center justify-center bg-gray-950 px-4">
@@ -26,12 +25,12 @@
 
       <div>
         <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium mb-1">Username</label>
-        {{ form.username|add_class:"w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-green-500" }}
+        {{ form.username }}
       </div>
 
       <div>
         <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium mb-1">Password</label>
-        {{ form.password|add_class:"w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-green-500" }}
+        {{ form.password }}
       </div>
 
       <input type="hidden" name="next" value="{{ next }}">
