@@ -13,39 +13,33 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import json
 import sys
+from decouple import config, Csv
+
 
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-with open(BASE_DIR / "config/setup.json") as f:
-    secrets = json.load(f)
 
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError as e:
-        error_msg = f"The settings variable {setting} was not found"
-        raise ImproperlyConfigured(error_msg) from e
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_secret("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(get_secret("DEBUG"))
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ENABLE_EMAILS = bool(get_secret("ENABLE_EMAILS"))
+ENABLE_EMAILS = config("ENABLE_EMAILS")
 
-ALLOWED_HOSTS = (get_secret("ALLOWED_HOSTS")).split(",")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
-EMAIL_HOST_USER = (get_secret("EMAIL_HOST_USER"))
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 
-EMAIL_HOST_PASSWORD = (get_secret("EMAIL_HOST_PASSWORD"))
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
 
 # Application definition

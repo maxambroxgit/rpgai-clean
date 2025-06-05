@@ -7,11 +7,12 @@ from django.http import JsonResponse
 import requests
 import json, re, os, random
 from django.contrib import messages as flash  # nuovo alias per Django flash
-from config.settings import get_secret
+from decouple import config
 
 
 
-API_KEY = get_secret("API_KEY")
+
+API_KEY = config("API_KEY")
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 LOG_FILE = "sessione_blame.json"
