@@ -3,18 +3,16 @@
 
 {% block content %}
 
-
 {% if request.user.is_authenticated %}
+<div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 px-6">
 
-    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 px-6">
   <!-- CHAT PRINCIPALE -->
   <div class="md:col-span-3 space-y-4">
     <h1 class="text-2xl font-bold text-green-400">💀 BLAM PUNK</h1>
-    <h2>Benvenuto nel Cyber Labirinto. Dove ti trovi non lo sai, nel centro di detenzione di un astronave che viaggia senza meta nello spazio, 
-        nelle profondità più recondite del pianeta terra, in una stazione orbitante intorno a uno dei satelliti di giove o forse in una 
-        simulazione virtuale iper-realistica in cui, come un simulacro disperato, ti muovi cercando una spiegazione a questa follia</h2>
+    <h2>Benvenuto nel Cyber Labirinto. Dove ti trovi non lo sai, nel centro di detenzione di un'astronave che viaggia senza meta nello spazio, 
+        nelle profondità più recondite del pianeta terra, in una stazione orbitante intorno a uno dei satelliti di Giove o forse in una 
+        simulazione virtuale iper-realistica in cui, come un simulacro disperato, ti muovi cercando una spiegazione a questa follia.</h2>
     <h3>Scrivi `d20` nella tua azione per tirare il dado.</h3>
-
     <h1>Ed ora cosa fai?</h1>
 
     <!-- Notifiche -->
@@ -26,20 +24,14 @@
         {% endfor %}
     {% endif %}
 
+    <!-- MESSAGGI DELLA STORIA -->
     <div id="chat-box" class="space-y-4 max-h-[70vh] overflow-y-auto px-4">
         {% for msg in messages_log %}
             {% if msg.role != "system" %}
             <div class="pt-4 {% if not forloop.first %}border-t border-gray-700{% endif %}">
                 <p class="text-sm text-gray-400">
-                <strong
-                    class="{% if msg.role == 'assistant' %}text-red-500{% elif msg.role == 'user' %}text-green-400{% endif %}">
-                    {% if msg.role == "assistant" %}
-                    DM:
-                    {% elif msg.role == "user" %}
-                    {{ username }}:
-                    {% else %}
-                    {{ msg.role|title }}:
-                    {% endif %}
+                <strong class="{% if msg.role == 'assistant' %}text-red-500{% elif msg.role == 'user' %}text-green-400{% endif %}">
+                    {% if msg.role == "assistant" %}DM:{% elif msg.role == "user" %}{{ username }}:{% else %}{{ msg.role|title }}:{% endif %}
                 </strong>
                 {{ msg.content }}
                 </p>
@@ -48,14 +40,16 @@
         {% endfor %}
     </div>
 
-    <form method="post" id="chat-form" class="flex gap-2">
+    <!-- FORM PRINCIPALE -->
+    <form method="post" id="chat-form" class="flex gap-2 mt-4">
         {% csrf_token %}
         <input type="text" name="user_input" placeholder="Cosa fai adesso?" autofocus required
                class="flex-1 p-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400" />
         <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded">Invia</button>
     </form>
 
-    <form action="{% url 'blamPunk:reset_session' %}" method="post">
+    <!-- RESET -->
+    <form action="{% url 'blamPunk:reset_session' %}" method="post" class="mt-2">
         {% csrf_token %}
         <button type="submit" class="text-sm text-red-400 hover:underline">🔁 Nuova Partita</button>
     </form>
@@ -66,68 +60,79 @@
     <h2 class="text-lg font-semibold text-gray-100">📊 Stato</h2>
     <p><strong class="text-red-400">HP:</strong> {{ game_state.hp }}</p>
     <p><strong>Livello:</strong> {{ game_state.level }}</p>
+
+    <!-- INVENTARIO -->
     <h3 class="mt-4 text-sm text-gray-400">🎒 Inventario</h3>
-    <ul class="list-disc list-inside text-gray-300 text-sm">
-      {% for item in game_state.inventory %}
-        <li>{{ item }}</li>
-      {% endfor %}
-    </ul>
-    
-    <form method="POST" action="{% url 'logout' %}">
+    {% if game_state.inventory %}
+        <ul class="list-disc list-inside text-gray-300 text-sm">
+            {% for item in game_state.inventory %}
+                <li>{{ item|capfirst }}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- MENU OGGETTI CONSUMABILI -->
+        <form method="post" class="mt-4 space-y-2">
+            {% csrf_token %}
+            <label for="use_item" class="text-sm text-gray-400">💊 Usa oggetto</label>
+            <select name="use_item" id="use_item" class="w-full bg-gray-700 border border-gray-600 text-white rounded p-2 text-sm">
+                <option value="">— Seleziona —</option>
+                {% for item in game_state.inventory %}
+                    {% if item in "medikit,siringa,kit di pronto soccorso" %}
+                        <option value="{{ item }}">{{ item|capfirst }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded">Usa</button>
+        </form>
+    {% else %}
+        <p class="text-sm italic text-gray-400">Nessun oggetto</p>
+    {% endif %}
+
+    <!-- LOGOUT -->
+    <form method="POST" action="{% url 'logout' %}" class="mt-6">
         {% csrf_token %}
-        <button type="submit" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">ESCI</button>
+        <button type="submit" class="inline-block w-full bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">ESCI</button>
     </form>
   </div>
+
 </div>
 
 {% else %}
 
-  <section class="px-6 py-20 text-center">
+<!-- SE NON LOGGATO -->
+<section class="px-6 py-20 text-center">
     <h1 class="text-4xl md:text-5xl font-bold text-green-400 mb-4">⚡ Cyber Dungeon</h1>
     <p class="text-gray-300 max-w-2xl mx-auto text-lg mb-6">
-      Per poter iniziare a giocare devi fare il Login, oppure devi Registrarti
+        Per poter iniziare a giocare devi fare il Login, oppure devi Registrarti
     </p>
     <div class="flex flex-wrap justify-center gap-4 mt-6">
-    <a href="/register" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">
-    Registrati Ora
-  </a>
-
-  <a href="{% url 'login' %}" class="inline-block bg-gray-700 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">
-    Login
-  </a>
-</div>
-
-  </section>
+        <a href="/register" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">Registrati Ora</a>
+        <a href="{% url 'login' %}" class="inline-block bg-gray-700 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">Login</a>
+    </div>
+</section>
 
 {% endif %}
 
+<!-- AUTO SCROLL JS -->
 <script>
   const chatBox = document.getElementById("chat-box");
 
   function scrollInstantlyToBottom() {
-    if (chatBox) {
-      chatBox.scrollTop = chatBox.scrollHeight; // niente smooth
-    }
+    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
   }
 
   function scrollSmoothlyToBottom() {
-    if (chatBox) {
-      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
-    }
+    if (chatBox) chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
   }
 
-  // Scroll immediato all'apertura (senza animazione)
   window.addEventListener("load", scrollInstantlyToBottom);
 
-  // Scroll fluido dopo invio del form
   const chatForm = document.getElementById("chat-form");
   if (chatForm) {
     chatForm.addEventListener("submit", function () {
-      setTimeout(scrollSmoothlyToBottom, 150); // leggero delay
+      setTimeout(scrollSmoothlyToBottom, 150);
     });
   }
 </script>
-
-
 
 {% endblock %}
