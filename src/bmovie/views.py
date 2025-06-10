@@ -201,3 +201,56 @@ def chat_bmovie(request):
         "game_state": game_state,
         "username": request.user.username if request.user.is_authenticated else "User"
     })
+
+
+def load_game_list(request):
+    """
+    Mostra una pagina con l'elenco dei file di salvataggio
+    per l'utente corrente.
+    """
+    # Costruisci il prefisso del file per filtrare i salvataggi
+    user_prefix = f"sessione_{request.user.username if request.user.is_authenticated else 'anonimo'}"
+    saved_games = []
+    
+    if os.path.exists(LOG_DIR):
+        for f in os.listdir(LOG_DIR):
+            # Mostra solo i file json che appartengono all'utente
+            if f.startswith(user_prefix) and f.endswith(".json"):
+                saved_games.append(f)
+    
+    # Ordina i salvataggi dal più recente al più vecchio
+    saved_games.sort(reverse=True)
+
+    return render(request, "bmovie/load_game.html", {"saved_games": saved_games})
+
+
+def load_game_session(request, filename):
+    """
+    Carica i dati da un file JSON specifico nella sessione dell'utente
+    e lo reindirizza alla chat.
+    """
+    # Controllo di sicurezza: l'utente può caricare solo i suoi file
+    user_prefix = f"sessione_{request.user.username if request.user.is_authenticated else 'anonimo'}"
+    if not filename.startswith(user_prefix):
+        flash.add_message(request, flash.ERROR, "Accesso non autorizzato a questo salvataggio.")
+        return redirect(reverse("bmovie:chat"))
+
+    file_path = os.path.join(LOG_DIR, filename)
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            session_data = json.load(f)
+        
+        # Popola la sessione con i dati caricati
+        request.session["bzak_messages"] = session_data.get("messages")
+        request.session["hp"] = session_data.get("hp")
+        request.session["inventario"] = session_data.get("inventario")
+        # Aggiungi qui altre variabili di gioco che potresti salvare, come gli "stats"
+        # request.session["stats"] = session_data.get("stats") 
+
+        flash.add_message(request, flash.SUCCESS, f"Partita '{filename}' caricata con successo!")
+    except FileNotFoundError:
+        flash.add_message(request, flash.ERROR, "File di salvataggio non trovato.")
+    except Exception as e:
+        flash.add_message(request, flash.ERROR, f"Errore nel caricamento della partita: {e}")
+
+    return redirect(reverse("bmovie:chat"))

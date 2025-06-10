@@ -1,0 +1,26 @@
+<!-- templates/bzak/load_game.html -->
+{% extends "base.html" %} <!-- Assumendo tu abbia un base template -->
+
+{% block content %}
+<div class="container">
+    <h1>Carica una Partita</h1>
+
+    {% if saved_games %}
+        <p>Seleziona una partita da caricare. La sessione corrente verrà sovrascritta.</p>
+        <ul class="list-group">
+            {% for game in saved_games %}
+                <li class="list-group-item">
+                    <a href="{% url 'bmovie:load_game_session' filename=game %}">
+                        {{ game }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessuna partita salvata trovata.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'bmovie:chat' %}" class="btn btn-secondary">Torna al Gioco</a>
+</div>
+{% endblock %}

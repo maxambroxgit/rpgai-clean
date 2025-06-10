@@ -9,10 +9,27 @@
   <!-- CHAT PRINCIPALE -->
   <div class="md:col-span-3 space-y-4">
     <h1 class="text-2xl font-bold text-green-400">B-Movie</h1>
+        <!-- Pulsanti per caricare partita o fare una nuova partita -->
+<div class="flex items-center space-x-4 my-4">
+    <!-- Pulsante "Carica Partita" (Verde) -->
+    <a href="{% url 'bmovie:load_game_list' %}"
+       class="bg-green-400 hover:bg-green-500 text-black font-bold py-2 px-4 rounded-lg transition-colors duration-200 ease-in-out no-underline">
+        Carica Partita
+    </a>
+
+    <!-- Pulsante "Nuova Partita" (Grigio) -->
+    <a href="{% url 'bmovie:reset_session' %}"
+       class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 ease-in-out no-underline">
+        Nuova Partita
+    </a>
+</div>
+
     <h2>In una città apparentemente normale, dove il traffico scorre lento e le offerte dei supermercati sembrano più spaventose delle notizie del telegiornale, si nasconde un mondo invisibile agli occhi dei più.
         Gli investigatori che si avventurano in questo ecosistema impazzito sanno che la verità non solo è là fuori, ma ha anche un pessimo senso dell’umorismo. Sei pronto ad investigare?
     </h3>
     <h1>Cosa fai?</h1>
+
+
 
     <!-- Notifiche -->
     {% if messages %}
@@ -47,11 +64,7 @@
         <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded">Invia</button>
     </form>
 
-    <!-- RESET -->
-    <form action="{% url 'blamPunk:reset_session' %}" method="post" class="mt-2">
-        {% csrf_token %}
-        <button type="submit" class="text-sm text-red-400 hover:underline">🔁 Nuova Partita</button>
-    </form>
+
   </div>
 
   <!-- SIDEBAR: STATO DI GIOCO -->
@@ -92,6 +105,15 @@
         {% csrf_token %}
         <button type="submit" class="inline-block w-full bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded shadow transition">ESCI</button>
     </form>
+
+       <div class="w-full">
+        <!-- Pulsante "Nuova Partita" (Grigio) -->
+    <a href="/"
+       class="bg-gray-500 w-full inline-block text-center hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200 ease-in-out no-underline">
+        Home Page
+    </a>
+        </div>
+
   </div>
 
 </div>
