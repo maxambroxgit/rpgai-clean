@@ -9,6 +9,7 @@ After=network.target
 User=rpgai
 Group=www-data
 WorkingDirectory=/home/rpgai/rpgai-clean/src
+EnvironmentFile=/path/al/progetto/giochidiruolo/src/.env
 ExecStart=/home/rpgai/rpg-clean/env/bin/gunicorn \
           --access-logfile - \
           --workers 3 \

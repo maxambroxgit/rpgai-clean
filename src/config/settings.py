@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'blamPunk',
     'home',
     'users',
+    'bmovie',
 
  
     'widget_tweaks',
