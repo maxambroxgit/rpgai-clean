@@ -63,7 +63,7 @@ def reset_session(request):
     request.session.pop("bzak_messages", None)
     request.session.pop("hp", None)
     request.session.pop("inventario", None)
-    return redirect(reverse("bzak:chat-dark"))
+    return redirect(reverse("bmovie:chat"))
 
 @csrf_exempt
 def chat_bmovie(request):
