@@ -24,6 +24,9 @@ system_prompt = (
     "con N uguale ai punti ferita persi. "
     "Quando il giocatore raccoglie qualcosa, rispondi tipo con 'Hai raccolto l'oggetto'. "
     "Guida la storia un passo alla volta e, alla fine di ogni scena, chiedi: 'Cosa fai adesso?'."
+    "Quando il giocatore tenta un'azione incerta (persuadere, schivare, indagare), richiedi un tiro di abilità. "
+    "Ad esempio: 'Per convincere l'alieno, fai un tiro di Carisma'. Il giocatore risponderà con 'tiro d20 Carisma'."
+    "Altro esempio: sil giocatore vuole esplorare, cercare o scoprire, fai un tiro Cervello. Il giocatore risponderà con 'tiro d20 Cervello'"
 )
 
 consumabili = {
@@ -51,6 +54,7 @@ def chat_V2(request):
         inventario = []
         stato_hp = f"[INFO] Il personaggio ha attualmente {hp} punti ferita."
         stato_inventario = f"[INFO] Il personaggio non possiede oggetti."
+        stats = {"Carisma": 2, "Prontezza": 1, "Cervello": 3, "Fegato": 0}
         messages.append({"role": "user", "content": stato_hp + " " + stato_inventario})
 
     if request.method == "POST":
@@ -66,6 +70,8 @@ def chat_V2(request):
             request.session["blame_messages"] = messages
             request.session["hp"] = hp
             request.session["inventario"] = inventario
+            request.session["stats"] = stats
+
 
             return render(request, "blamPunk/chat_dark.html", {
                 "messages_log": messages,
@@ -91,8 +97,19 @@ def chat_V2(request):
             })
 
         if "d20" in user_input.lower():
+            stats = request.session.get("stats", {})
+            match = re.search(r"d20\s+(\w+)", user_input, re.IGNORECASE)
+            skill_name = match.group(1).capitalize() if match else None
+            
             roll = random.randint(1, 20)
-            user_input = user_input.replace("d20", f"**TIRO D20: {roll}**")
+            modifier = stats.get(skill_name, 0)
+            total = roll + modifier
+
+            roll_result = f"**TIRO D20 ({skill_name or 'Generico'}): {roll} + {modifier} = {total}**"
+
+            user_input = user_input.replace("d20", roll_result)
+            
+
 
         messages.append({"role": "user", "content": user_input})
 
