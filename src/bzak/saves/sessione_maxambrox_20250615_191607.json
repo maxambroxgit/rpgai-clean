@@ -1,0 +1,19 @@
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "[INFO] Il personaggio ha attualmente 20 punti ferita. [INFO] Il personaggio non possiede oggetti."
+    },
+    {
+      "role": "user",
+      "content": "perlustro la zona"
+    },
+    {
+      "role": "assistant",
+      "content": "**Perlustrazione della zona**\n\nMentre perlustri la zona, noti che ti trovi in una stanza piuttosto piccola e spoglia. Le pareti sono in pietra e il pavimento è in legno grezzo. Non ci sono finestre, solo una porta di legno massello che sembra essere l'unica via d'uscita.\n\n**Trovato:**\n\n* Un piccolo angolo con un mucchio di paglia e un paio di coperte logore, che potrebbero essere utili per riposare o nascondere qualcosa.\n* Un buco nel muro, abbastanza grande da poter essere usato come un nascondiglio o un passaggio segreto. Il buco è troppo piccolo per essere usato come via d'uscita, ma potrebbe essere utile per nascondere oggetti.\n\n**Nessun oggetto o tesoro trovato**\n\nLa stanza sembra essere stata svuotata da poco tempo. Non ci sono oggetti o tesori apparenti da trovare.\n\n**Situazione attuale:**\n\n* Punti ferita: 20\n* Oggetti: nessuno\n\nCosa vuoi fare adesso?"
+    }
+  ],
+  "hp": 20,
+  "inventario": [],
+  "objective": "Scopri dove ti trovi"
+}

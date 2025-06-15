@@ -50,9 +50,20 @@ def check_for_level_up(request):
     Restituisce True se il level up è avvenuto, altrimenti False.
     """
     # Carica i dati correnti dalla sessione
+
+    stats = request.session.get("stats", {})
+
+    # --- BLOCCO DI SICUREZZA AGGIUNTO ---
+    # Se il dizionario stats è vuoto (perché caricato da un vecchio salvataggio),
+    # lo inizializziamo con i valori di default prima di procedere.
+    if not stats:
+        stats = {"Carisma": 2, "Prontezza": 1, "Cervello": 3, "Fegato": 0}
+        # (Opzionale ma consigliato) Salva le stats appena create nella sessione
+        request.session["stats"] = stats
+    # --- FINE BLOCCO DI SICUREZZA ---
+
     level = request.session.get("level", 1)
     objectives_completed = request.session.get("objectives_completed", 0)
-    stats = request.session.get("stats", {})
     
     # Definisci la soglia per il level up (es. 10 obiettivi)
     # Potresti renderla dinamica, es. 10 * level
@@ -85,7 +96,7 @@ def check_for_level_up(request):
             f"🎉 **LEVEL UP!** 🎉\n"
             f"Hai raggiunto il livello **{new_level}**!\n"
             f"Le tue statistiche sono aumentate! Ora sono:\n"
-            f"Sarcasmo: {stats['Sarcasmo']}, Prontezza: {stats['Prontezza']}, "
+            f"Carisma: {stats['Carisma']}, Prontezza: {stats['Prontezza']}, "
             f"Cervello: {stats['Cervello']}, Fegato: {stats['Fegato']}.\n"
             f"I tuoi HP sono stati ricaricati e aumentati a {hp}!"
         )
@@ -97,12 +108,12 @@ def check_for_level_up(request):
 
 @csrf_exempt
 def chat_V2(request):
-    messages = request.session.get("blame_messages")
+    messages = request.session.get("blame_messages", [])
     hp = request.session.get("hp")
     inventario = request.session.get("inventario")
 
     if not messages or not isinstance(hp, int) or not isinstance(inventario, list):
-        messages = []
+        messages = [{"role": "system", "content": system_prompt}]
         hp = STARTING_HP
         inventario = []
         stato_hp = f"[INFO] Il personaggio ha attualmente {hp} punti ferita."
@@ -258,19 +269,20 @@ def chat_V2(request):
 
     
 
-    game_state = {
-        "hp": hp,
-        "level": 1,
-        "inventory": inventario,
-        "obiettivo": request.session["objective"]
+    messages_for_template = [msg for msg in messages if msg.get("role") != "system"]
+
+    context = {
+        'messages_log': messages_for_template,  # <-- USA LA LISTA FILTRATA
+        'username': request.user.username if request.user.is_authenticated else 'Giocatore',
+        'hp': request.session.get("hp"),
+        'inventario': request.session.get("inventario"),
+        'objective': request.session.get("objective"),
+        'level': request.session.get("level"),
+        'stats': request.session.get("stats"),
     }
 
-    return render(request, "blamPunk/chat_dark.html", {
-        "messages_log": messages,
-        "hp": hp,
-        "game_state": game_state,
-        "username": request.user.username if request.user.is_authenticated else "User"
-    })
+    return render(request, "blamPunk/chat_dark.html", context)
+
 
 def load_game_list(request):
     """

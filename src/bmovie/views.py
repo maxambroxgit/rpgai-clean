@@ -75,9 +75,20 @@ def check_for_level_up(request):
     Restituisce True se il level up è avvenuto, altrimenti False.
     """
     # Carica i dati correnti dalla sessione
+ 
+    stats = request.session.get("stats", {})
+
+    # --- BLOCCO DI SICUREZZA AGGIUNTO ---
+    # Se il dizionario stats è vuoto (perché caricato da un vecchio salvataggio),
+    # lo inizializziamo con i valori di default prima di procedere.
+    if not stats:
+        stats = {"Sarcasmo": 2, "Prontezza": 1, "Cervello": 3, "Fegato": 0}
+        # (Opzionale ma consigliato) Salva le stats appena create nella sessione
+        request.session["stats"] = stats
+    # --- FINE BLOCCO DI SICUREZZA ---
+
     level = request.session.get("level", 1)
     objectives_completed = request.session.get("objectives_completed", 0)
-    stats = request.session.get("stats", {})
     
     # Definisci la soglia per il level up (es. 10 obiettivi)
     # Potresti renderla dinamica, es. 10 * level
@@ -117,24 +128,28 @@ def check_for_level_up(request):
 
 @csrf_exempt
 def chat_bmovie(request):
-    messages = request.session.get("bzak_messages")
+    messages = request.session.get("bzak_messages", [])
     hp = request.session.get("hp")
     inventario = request.session.get("inventario")
-    request.session["objective"] = "Scopri dove ti trovi"
 
 
     if not messages or not isinstance(hp, int) or not isinstance(inventario, list):
-        messages = []
+        messages = [{"role": "system", "content": system_prompt}]
         hp = STARTING_HP
         inventario = []
         stato_hp = f"[INFO] Il personaggio ha attualmente {hp} punti ferita."
         stato_inventario = f"[INFO] Il personaggio non possiede oggetti."
-        stats = {
-            "Carisma": 1, 
-            "Prontezza": 2, 
-            "Cervello": 1, 
-            "Fegato": 2
-            }
+        request.session["objective"] = "Scopri dove ti trovi"
+
+        
+        #INIZIALIZZAZIONE DELLE CARATTERISTICHE
+        initial_stats = {"Carisma": 2, "Prontezza": 1, "Cervello": 3, "Fegato": 0}
+        request.session["stats"] = initial_stats
+
+        # CAMPI PER LA PROGRESSIONE DEL LIVELLO
+        request.session["level"] = 1
+        request.session["objectives_completed"] = 0
+        
         messages.append({"role": "user", "content": stato_hp + " " + stato_inventario})
 
     if request.method == "POST":
@@ -270,20 +285,20 @@ def chat_bmovie(request):
                 })
         else:
             flash.add_message(request, flash.ERROR, "Errore nella risposta dell'AI. Riprova più tardi.")
+    
+    messages_for_template = [msg for msg in messages if msg.get("role") != "system"]
 
-    game_state = {
-        "hp": hp,
-        "level": 1,
-        "inventory": inventario,
-        "objective": request.session["objective"]
+    context = {
+        'messages_log': messages_for_template,  # <-- USA LA LISTA FILTRATA
+        'username': request.user.username if request.user.is_authenticated else 'Giocatore',
+        'hp': request.session.get("hp"),
+        'inventario': request.session.get("inventario"),
+        'objective': request.session.get("objective"),
+        'level': request.session.get("level"),
+        'stats': request.session.get("stats"),
     }
-
-    return render(request, "bmovie/chat.html", {
-        "messages_log": messages,
-        "hp": hp,
-        "game_state": game_state,
-        "username": request.user.username if request.user.is_authenticated else "User"
-    })
+    
+    return render(request, "bmovie/chat.html", context)
 
 
 def load_game_list(request):

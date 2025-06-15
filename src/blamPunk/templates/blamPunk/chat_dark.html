@@ -18,7 +18,7 @@
     </a>
 
     <!-- Pulsante "Nuova Partita" (Grigio) -->
-    <a href="{% url 'bmovie:reset_session' %}"
+    <a href="{% url 'blamPunk:reset_session' %}"
        class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 ease-in-out no-underline">
         Nuova Partita
     </a>
@@ -29,12 +29,17 @@
     <h3>Scrivi `d20` nella tua azione per tirare il dado.</h3>
     <h1>Ed ora cosa fai?</h1>
 
-   <!-- Notifiche / Messaggi Flash -->
+<!-- Notifiche / Messaggi Flash - VERSIONE CORRETTA -->
 {% if messages %}
-    <div class="fixed top-5 right-5 z-50 w-full max-w-sm space-y-3 dismissable-alert relative p-4 rounded-lg shadow-lg flex items-start space-x-3 
-                    transition-opacity duration-300 ease-in-out opacity-100" role="alert">
+    <!-- 1. Contenitore ESTERNO. Serve solo a posizionare il blocco di notifiche in alto a destra. -->
+    <div class="fixed top-5 right-5 z-50 w-full max-w-sm space-y-3">
+
+    <!-- 2. Ciclo FOR. Itera su ogni messaggio per creare una notifica separata. -->
     {% for message in messages %}
-        <div class="p-4 rounded-lg shadow-lg flex items-start space-x-3
+
+        <!-- 3. Contenitore INTERNO (la singola notifica). QUESTO DIV SI RIPETE PER OGNI MESSAGGIO. -->
+        <!-- Tutte le classi di stile e lo script per nasconderlo vanno qui. -->
+        <div class="dismissable-alert relative p-4 rounded-lg shadow-lg flex items-start space-x-3 transition-opacity duration-300 ease-in-out opacity-100
             {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
                 bg-green-100 border border-green-400 text-green-800
             {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
@@ -46,30 +51,20 @@
             {% endif %}"
             role="alert">
             
-            <!-- Icona (Opzionale ma consigliata) -->
+            <!-- 4. Elementi INTERNI alla notifica (Icona, Testo, Pulsante). Sono tutti "fratelli" dentro il contenitore. -->
+
+            <!-- Icona -->
             <div class="flex-shrink-0">
                 {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-                    <!-- SVG per icona Successo (spunta) -->
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">...</svg>
                 {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                    <!-- SVG per icona Errore (X) -->
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">...</svg>
                 {% else %}
-                     <!-- SVG per icona Info (i) -->
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">...</svg>
                 {% endif %}
             </div>
-           
-            <!-- Pulsante di Chiusura Manuale con una classe specifica -->
-            <div class="absolute top-2 right-2">
-                <button class="close-alert-btn text-gray-500 hover:text-gray-800">
-                    <span class="sr-only">Chiudi</span>
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                </button>
-            </div>
-        </div>
-
-            <!-- Testo del messaggio -->
+            
+            <!-- Testo del messaggio (ora è DENTRO il div colorato) -->
             <div class="flex-1">
                 <p class="font-bold">
                     {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}Successo!
@@ -79,10 +74,33 @@
                 </p>
                 <p class="text-sm">{{ message }}</p>
             </div>
-            
-        </div>
-    {% endfor %}
-    </div>
+
+            <!-- Pulsante di Chiusura Manuale - Versione Migliorata e Visibile -->
+            <div class="absolute top-1 right-1">
+                <button @click="show = false"
+                    type="button"
+                    class="close-alert-btn rounded-md p-1.5
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %} text-green-700 hover:bg-green-200 focus:ring-green-600 {% endif %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} text-red-700 hover:bg-red-200 focus:ring-red-600 {% endif %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %} text-yellow-700 hover:bg-yellow-200 focus:ring-yellow-600 {% endif %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO or not message.level %} text-blue-700 hover:bg-blue-200 focus:ring-blue-600 {% endif %}
+                        focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    aria-label="Chiudi">
+                    
+                    <span class="sr-only">Chiudi</span>
+                    
+                    <!-- Icona SVG "X" -->
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                </button>
+            </div>
+
+        </div> <!-- Fine del contenitore INTERNO (la singola notifica) -->
+
+    {% endfor %} <!-- Fine del ciclo FOR -->
+
+    </div> <!-- Fine del contenitore ESTERNO -->
 {% endif %}
 
     <!-- MESSAGGI DELLA STORIA -->
@@ -119,15 +137,15 @@
   <!-- SIDEBAR: STATO DI GIOCO -->
   <div class="space-y-4 bg-gray-800 p-4 rounded border border-gray-700">
     <h2 class="text-lg font-semibold text-gray-100">📊 Stato</h2>
-    <p><strong class="text-red-400">HP:</strong> {{ game_state.hp }}</p>
-    <p><strong>Livello:</strong> {{ game_state.level }}</p>
-    <p><strong>Ultimo Obiettivo:</strong> <span class="text-gray-400">{{ game_state.obiettivo }}</span></p>
+    <p><strong class="text-red-400">HP:</strong> {{ hp }}</p>
+    <p><strong>Livello:</strong> {{ level }}</p>
+    <p><strong>Obiettivo:</strong> <span class="text-gray-400">{{ objective }}</span></p>
 
     <!-- INVENTARIO -->
     <h3 class="text-lg font-semibold text-gray-100">🎒 Inventario</h3>
-    {% if game_state.inventory %}
+    {% if inventory %}
         <ul class="list-disc list-inside text-gray-300 text-sm">
-            {% for item in game_state.inventory %}
+            {% for item in inventory %}
                 <li>{{ item|capfirst }}</li>
             {% endfor %}
         </ul>
@@ -138,7 +156,7 @@
             <label for="use_item" class="text-sm text-gray-400">💊 Usa oggetto</label>
             <select name="use_item" id="use_item" class="w-full bg-gray-700 border border-gray-600 text-white rounded p-2 text-sm">
                 <option value="">— Seleziona —</option>
-                {% for item in game_state.inventory %}
+                {% for item in inventory %}
                     {% if item in "medikit,siringa,kit di pronto soccorso" %}
                         <option value="{{ item }}">{{ item|capfirst }}</option>
                     {% endif %}
@@ -203,6 +221,55 @@
       setTimeout(scrollSmoothlyToBottom, 150);
     });
   }
+</script>
+
+<!-- ========================================================== -->
+<!--       AGGIUNGI QUESTO BLOCCO SCRIPT SUBITO QUI SOTTO       -->
+<!-- ========================================================== -->
+<script>
+// Aspetta che l'intero contenuto della pagina sia stato caricato
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Seleziona TUTTE le notifiche che hanno la classe '.dismissable-alert'
+    const alerts = document.querySelectorAll('.dismissable-alert');
+
+    // Per ogni notifica trovata, applica la seguente logica
+    alerts.forEach(alert => {
+        
+        // Trova il pulsante di chiusura DENTRO la notifica corrente
+        const closeButton = alert.querySelector('.close-alert-btn');
+
+        // Definisci una funzione per nascondere e rimuovere la notifica
+        const dismissAlert = () => {
+            // Aggiungi una classe per avviare l'animazione di scomparsa
+            alert.style.opacity = '0';
+            
+            // Facoltativo: per evitare che si possa cliccare durante la scomparsa
+            alert.style.pointerEvents = 'none';
+
+            // Rimuovi l'elemento dalla pagina dopo che l'animazione è finita
+            setTimeout(() => {
+                // remove() elimina l'elemento dal DOM
+                alert.remove();
+            }, 300); // Deve corrispondere alla 'duration-300' di Tailwind
+        };
+
+        // Se il pulsante di chiusura esiste, aggiungi un "ascoltatore" per il click
+        if (closeButton) {
+            closeButton.addEventListener('click', dismissAlert);
+        }
+
+        // Imposta un timer per far scomparire la notifica automaticamente dopo 10 secondi
+        const autoDismissTimer = setTimeout(dismissAlert, 10000);
+
+        // Opzionale ma consigliato: Ferma il timer automatico se l'utente chiude manualmente
+        if(closeButton) {
+            closeButton.addEventListener('click', () => {
+                clearTimeout(autoDismissTimer);
+            });
+        }
+    });
+});
 </script>
 
 {% endblock %}
