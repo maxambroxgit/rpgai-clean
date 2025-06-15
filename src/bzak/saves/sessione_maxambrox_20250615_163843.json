@@ -1,0 +1,19 @@
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "[INFO] Il personaggio ha attualmente 20 punti ferita. [INFO] Il personaggio non possiede oggetti."
+    },
+    {
+      "role": "user",
+      "content": "si sono pronto ad investigare"
+    },
+    {
+      "role": "assistant",
+      "content": "**Sei pronto a iniziare la tua indagine**\n\nTi trovi in una stanza ampia e spoglia, con pareti di pietra grigia e un soffitto alto. La stanza è illuminata da alcune torce che bruciano alle pareti, gettando ombre sinistre sul pavimento.\n\n**La tua situazione attuale:**\n\n* Punti ferita: 20\n* Oggetti: nessuno\n\n**La stanza:**\n\nLa stanza è piuttosto ampia, circa 10 metri per 10 metri. Al centro della stanza c'è un grande tavolo di legno, con alcune sedie intorno. Il tavolo sembra essere stato utilizzato recentemente, ci sono ancora alcuni segni di cibo e bevande.\n\nSul lato nord della stanza, c'è una porta di legno massiccio, chiusa con un grande catenaccio. La porta sembra essere l'unica via d'uscita.\n\nSul lato est della stanza, c'è una finestra alta e stretta, con vetri sporchi e opachi. La finestra sembra non essere stata aperta da molto tempo.\n\n**Cosa vuoi fare?**\n\n1. Esaminare il tavolo e le sedie\n2. Andare verso la porta di legno massiccio\n3. Avvicinarsi alla finestra\n4. Cerca di trovare un oggetto o un indizio\n\nScegli la tua azione:"
+    }
+  ],
+  "hp": 20,
+  "inventario": [],
+  "objective": "Scopri perché il latte al supermercato sa di benzina."
+}

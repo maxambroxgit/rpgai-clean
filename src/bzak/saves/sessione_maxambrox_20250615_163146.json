@@ -1,0 +1,19 @@
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "[INFO] Il personaggio ha attualmente 20 punti ferita. [INFO] Il personaggio non possiede oggetti."
+    },
+    {
+      "role": "user",
+      "content": "si sono pronto"
+    },
+    {
+      "role": "assistant",
+      "content": "Sembra che tu sia pronto per iniziare un'avventura o una sessione di gioco di ruolo. Il tuo personaggio ha 20 punti ferita, il che significa che può subire un certo amount di danno prima di essere sconfitto. Inoltre, non hai oggetti nel tuo inventario, quindi dovrai procurarteli o utilizzarli durante il gioco.\n\nCosa vuoi fare? Vuoi:\n1. Iniziare l'avventura\n2. Creare un personaggio\n3. Chiedere informazioni sul mondo di gioco\n4. Altro (specifica)\n\nScegli la tua risposta!"
+    }
+  ],
+  "hp": 20,
+  "inventario": [],
+  "objective": "Scopri perché il latte al supermercato sa di benzina."
+}

@@ -51,6 +51,7 @@ system_prompt = (
 "Guida la storia un passo alla volta e, alla fine di ogni scena, chiedi: 'Cosa fai adesso?'."
 "Ad esempio: 'Per convincere un coniglio o altro personaggio non giocante, fai un tiro di Carisma'. Il giocatore risponderà con 'tiro d20 Carisma'."
 "Altro esempio: sil giocatore vuole esplorare, cercare o scoprire, fai un tiro Cervello. Il giocatore risponderà con 'tiro d20 Cervello'"
+"Quando un obiettivo importante viene completato o uno nuovo viene scoperto, comunicalo usando la stringa speciale: [OBJECTIVE] Il nuovo obiettivo è..."
 )
 
 
@@ -72,14 +73,21 @@ def chat_bmovie(request):
     messages = request.session.get("bzak_messages")
     hp = request.session.get("hp")
     inventario = request.session.get("inventario")
+    request.session["objective"] = "Scopri dove ti trovi"
+
 
     if not messages or not isinstance(hp, int) or not isinstance(inventario, list):
-        messages = [{"role": "system", "content": system_prompt}]
+        messages = []
         hp = STARTING_HP
         inventario = []
         stato_hp = f"[INFO] Il personaggio ha attualmente {hp} punti ferita."
         stato_inventario = f"[INFO] Il personaggio non possiede oggetti."
-        stats = {"Carisma": 5, "Prontezza": 2, "Cervello": 1, "Fegato": 8}
+        stats = {
+            "Carisma": 1, 
+            "Prontezza": 2, 
+            "Cervello": 1, 
+            "Fegato": 2
+            }
         messages.append({"role": "user", "content": stato_hp + " " + stato_inventario})
 
     if request.method == "POST":
@@ -89,8 +97,7 @@ def chat_bmovie(request):
             cura = consumabili[item_selected]
             hp = min(hp + cura, STARTING_HP)
             inventario.remove(item_selected)
-            messages.append({"role": "user", "content": f"[AZIONE] Hai usato '{item_selected}' e recuperato {cura} HP. HP attuali: {hp}"})
-            flash.add_message(request, flash.SUCCESS, f"💊 Hai usato '{item_selected}' e recuperato {cura} HP.")
+            flash.add_message(request, flash.SUCCESS, f"💊 Hai usato '{item_selected}' e recuperato {cura} HP. HP attuali: {hp}")
 
             request.session["bzak_messages"] = messages
             request.session["hp"] = hp
@@ -158,10 +165,16 @@ def chat_bmovie(request):
                     danno = int(match.group(1))
                     if 0 <= danno <= STARTING_HP:
                         hp = max(hp - danno, 0)
-                        messages.append({"role": "user", "content": f"[INFO] Hai perso {danno} HP. HP attuali: {hp}"})
                         flash.add_message(request, flash.WARNING, f"🩸 Hai perso {danno} punti ferita! HP attuali: {hp}")
                 except (ValueError, TypeError):
                     pass
+
+            # Parsing OBIETTIVI
+            obj_match = re.search(r"\[OBJECTIVE\]\s*(.*)", reply, re.IGNORECASE)
+            if obj_match:
+                new_objective = obj_match.group(1).strip()
+                request.session["objective"] = new_objective
+                flash.add_message(request, flash.INFO, f"🎯 Nuovo obiettivo: {new_objective}")
 
             # Parsing oggetti raccolti
             oggetti = re.findall(r"Hai raccolto\s+(?:un[oa]?|il|lo|la|le|gli|i)\s+([\w\s]+?)(?:\.|\n|$)", reply, re.IGNORECASE)
@@ -169,7 +182,6 @@ def chat_bmovie(request):
                 oggetto = oggetto.strip().lower()
                 if oggetto not in inventario:
                     inventario.append(oggetto)
-                    messages.append({"role": "user", "content": f"[INFO] Hai raccolto: {oggetto}"})
                     flash.add_message(request, flash.INFO, f"📦 Oggetto aggiunto all'inventario: {oggetto}")
 
             request.session["bzak_messages"] = messages
@@ -180,7 +192,8 @@ def chat_bmovie(request):
             session_data = {
                 "messages": messages,
                 "hp": hp,
-                "inventario": inventario
+                "inventario": inventario,
+                "objective": request.session["objective"]
             }
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"sessione_{request.user.username if request.user.is_authenticated else 'anonimo'}_{timestamp}.json"
@@ -205,7 +218,8 @@ def chat_bmovie(request):
     game_state = {
         "hp": hp,
         "level": 1,
-        "inventory": inventario
+        "inventory": inventario,
+        "objective": request.session["objective"]
     }
 
     return render(request, "bmovie/chat.html", {
