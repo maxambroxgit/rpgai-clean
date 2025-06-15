@@ -68,6 +68,53 @@ def reset_session(request):
     request.session.pop("inventario", None)
     return redirect(reverse("bmovie:chat"))
 
+def check_for_level_up(request):
+    """
+    Controlla se il giocatore ha completato abbastanza obiettivi per salire di livello.
+    Se sì, aggiorna il livello, le statistiche e invia un messaggio di notifica.
+    Restituisce True se il level up è avvenuto, altrimenti False.
+    """
+    # Carica i dati correnti dalla sessione
+    level = request.session.get("level", 1)
+    objectives_completed = request.session.get("objectives_completed", 0)
+    stats = request.session.get("stats", {})
+    
+    # Definisci la soglia per il level up (es. 10 obiettivi)
+    # Potresti renderla dinamica, es. 10 * level
+    objectives_needed = 10
+    
+    if objectives_completed >= objectives_needed:
+        # --- LEVEL UP! ---
+        
+        # 1. Aumenta il livello
+        new_level = level + 1
+        request.session["level"] = new_level
+        
+        # 2. Resetta il contatore degli obiettivi per il prossimo livello
+        # (sottraendo quelli già usati per questo level up)
+        request.session["objectives_completed"] = objectives_completed - objectives_needed
+        
+        # 3. Aumenta le statistiche (logica di esempio)
+        # Qui puoi essere creativo. Aumentiamo ogni stat di 1.
+        for stat_name in stats.keys():
+            stats[stat_name] += 1
+        request.session["stats"] = stats
+        
+        # 5. Crea un messaggio di notifica per il giocatore
+        level_up_message = (
+            f"🎉 **LEVEL UP!** 🎉\n"
+            f"Hai raggiunto il livello **{new_level}**!\n"
+            f"Le tue statistiche sono aumentate! Ora sono:\n"
+            f"Sarcasmo: {stats['Sarcasmo']}, Prontezza: {stats['Prontezza']}, "
+            f"Cervello: {stats['Cervello']}, Fegato: {stats['Fegato']}.\n"
+            f"I tuoi HP sono stati ricaricati e aumentati a {hp}!"
+        )
+        flash.add_message(request, flash.SUCCESS, level_up_message)
+        
+        return True # Level up avvenuto
+        
+    return False # Nessun level up
+
 @csrf_exempt
 def chat_bmovie(request):
     messages = request.session.get("bzak_messages")
@@ -175,6 +222,15 @@ def chat_bmovie(request):
                 new_objective = obj_match.group(1).strip()
                 request.session["objective"] = new_objective
                 flash.add_message(request, flash.INFO, f"🎯 Nuovo obiettivo: {new_objective}")
+                
+                # 2. Incrementa il contatore degli obiettivi completati
+                # Usiamo .get(key, 0) + 1 per sicurezza se la chiave non esistesse
+                current_completed = request.session.get("objectives_completed", 0)
+                request.session["objectives_completed"] = current_completed + 1
+                
+                # 3. CHIAMA LA NUOVA FUNZIONE PER IL CONTROLLO DEL LEVEL UP!
+                # Questo è il punto perfetto per farlo.
+                check_for_level_up(request)
 
             # Parsing oggetti raccolti
             oggetti = re.findall(r"Hai raccolto\s+(?:un[oa]?|il|lo|la|le|gli|i)\s+([\w\s]+?)(?:\.|\n|$)", reply, re.IGNORECASE)
