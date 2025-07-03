@@ -42,3 +42,12 @@ Le funzionalità chiave includono:
 -   **`django-registration`**: Per la gestione della registrazione degli utenti.
 
 Questo progetto offre un'interessante implementazione di giochi di ruolo testuali basati su IA, con la possibilità di espandere facilmente con nuovi temi e narrazioni.
+
+## Aggiornamenti Recenti
+
+### 2025-07-03
+
+-   **Miglioramenti SEO e Social Sharing**: Aggiunti meta tag `description` e Open Graph (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`) per ottimizzare la visibilità sui motori di ricerca e l'anteprima sui social media.
+-   **Integrazione Logo**: Inserito il logo (`thedungeon-prova-logo.png`) e la thumbnail (`thedungeon-thumbnail.jpg`) nella home page e configurati i relativi percorsi statici.
+-   **Aggiornamenti Testuali**: Modificati i testi nella home page per riflettere il nuovo branding (es. da "RPG AI" a "thedungeon", da "I Nostri Giochi" a "Le nostre ambientazioni").
+-   **Refactoring URL blamPunk**: Allineato il nome della funzione di vista in `blamPunk/urls.py` (da `chat_V2` a `chat_view`).

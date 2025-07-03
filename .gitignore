@@ -198,3 +198,7 @@ cython_debug/
 config/setup.json
 *.env
 *.pyc
+
+# Ignora i file di salvataggio delle sessioni
+src/blamPunk/saves/
+src/bzak/saves/
