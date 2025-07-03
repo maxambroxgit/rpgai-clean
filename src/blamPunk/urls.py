@@ -1,5 +1,5 @@
 from django.urls import path
-from blamPunk import views_gemini_cli as views
+from blamPunk import views
 
 app_name = "blamPunk"
 
