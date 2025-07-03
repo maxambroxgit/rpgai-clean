@@ -5,9 +5,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Esplora mondi oscuri, combatti entità biomeccaniche, sopravvivi nei labirinti infiniti. Gioca di ruolo con l'AI">
+
+  <!-- Open Graph Meta Tags for Social Sharing -->
+  <meta property="og:title" content="thedungeon, esplora mondi con l'AI">
+  <meta property="og:description" content="Esplora mondi oscuri, combatti entità biomeccaniche, sopravvivi nei labirinti infiniti. Gioca di ruolo con l'AI">
+  <meta property="og:image" content="{% static 'img/thedungeon-thumbnail.jpg' %}">
+  <meta property="og:url" content="https://www.thedungeon.ai">
+  <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <title>{% block title %}RPG AI{% endblock %}</title>
+  <title>{% block title %}thedungeon{% endblock %}</title>
 </head>
 
 <body class="bg-gray-900 text-gray-100 font-mono min-h-screen py-8 flex flex-col justify-between">
@@ -17,7 +25,7 @@
   </main>
 
   <footer class="text-center py-6 text-gray-500 text-sm">
-    <p>© RPG AI {% now "Y" %} – Tutti i diritti riservati – 
+    <p>© thedungeon.ai {% now "Y" %} – Tutti i diritti riservati – 
       <a href="{% url 'privacy' %}" class="text-green-400 hover:underline">Privacy Policy</a>
     </p>
   </footer>
