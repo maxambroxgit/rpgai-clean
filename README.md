@@ -51,3 +51,11 @@ Questo progetto offre un'interessante implementazione di giochi di ruolo testual
 -   **Integrazione Logo**: Inserito il logo (`thedungeon-prova-logo.png`) e la thumbnail (`thedungeon-thumbnail.jpg`) nella home page e configurati i relativi percorsi statici.
 -   **Aggiornamenti Testuali**: Modificati i testi nella home page per riflettere il nuovo branding (es. da "RPG AI" a "thedungeon", da "I Nostri Giochi" a "Le nostre ambientazioni").
 -   **Refactoring URL blamPunk**: Allineato il nome della funzione di vista in `blamPunk/urls.py` (da `chat_V2` a `chat_view`).
+
+### 2025-07-04
+
+-   **Correzione Reindirizzamento Caricamento Partita**: Risolto il problema di reindirizzamento errato del link "Torna al Gioco" nella pagina di caricamento di `blamPunk`, assicurando che punti correttamente all'app `blamPunk`.
+-   **Standardizzazione Logica Caricamento Partita**: Uniformata la logica delle viste `load_game_list` e `load_game_session` e dei relativi template per `blamPunk` e `bmovie`, garantendo il corretto passaggio e interpretazione del parametro `app` per i reindirizzamenti.
+-   **Correzione Pulsante "Carica Partita"**: Sistemato il link del pulsante "Carica Partita" nella pagina di chat di `blamPunk`, ora indirizza correttamente alla pagina di caricamento di `blamPunk`.
+-   **Link Homepage per Loghi**: Aggiunto un link alla homepage a tutte le istanze del logo `thedungeon-prova-logo.png` nei template HTML.
+-   **Integrazione Metatag SEO**: Implementati i metatag SEO nei template di chat di `blamPunk` (`chat_dark.html`) e `bmovie` (`chat.html`) tramite un nuovo blocco `extra_head` in `base.html`, permettendo la personalizzazione dei metatag per ciascuna app.

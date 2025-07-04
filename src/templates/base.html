@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block extra_head %}
   <meta name="description" content="Esplora mondi oscuri, combatti entità biomeccaniche, sopravvivi nei labirinti infiniti. Gioca di ruolo con l'AI">
 
   <!-- Open Graph Meta Tags for Social Sharing -->
@@ -13,9 +14,10 @@
   <meta property="og:image" content="{% static 'img/thedungeon-thumbnail.jpg' %}">
   <meta property="og:url" content="https://www.thedungeon.ai">
   <meta property="og:type" content="website">
+  {% endblock %}
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <link rel="icon" href="{% static 'img/favicon.ico' %}">
+  <link rel="icon" href="{% static 'img/favicon.png' %}">
   <title>{% block title %}thedungeon{% endblock %}</title>
 </head>
 

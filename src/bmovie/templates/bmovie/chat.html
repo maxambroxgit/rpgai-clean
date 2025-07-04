@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 {% block title %} B-MOVIE - {{ block.super }}{% endblock %}
+{% load static %}
+
+{% block extra_head %}
+  <meta name="description" content="Un'avventura AI nel mondo folle e bizzarro di BZak Mckracken and Alien Mindbenders.">
+  <meta property="og:title" content="B-Movie - thedungeon.ai">
+  <meta property="og:description" content="Un'avventura AI nel mondo folle e bizzarro di BZak Mckracken and Alien Mindbenders.">
+  <meta property="og:image" content="{% static 'img/thedungeon-thumbnail.jpg' %}">
+  <meta property="og:url" content="https://www.thedungeon.ai/bmovie/chat">
+  <meta property="og:type" content="website">
+{% endblock %}
 
 {% block content %}
 
 {% if request.user.is_authenticated %}
 <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 px-6">
+
+    
 
   <!-- CHAT PRINCIPALE -->
   <div class="md:col-span-3 space-y-4">

@@ -403,7 +403,7 @@ def load_game_list(request):
                 saved_games.append(f)
     
     saved_games.sort(reverse=True)
-    return render(request, "blamPunk/load_game.html", {"saved_games": saved_games})
+    return render(request, "blamPunk/load_game.html", {"saved_games": saved_games, "app_name": "blamPunk"})
 
 def load_game_session(request, filename):
     """Carica una sessione di gioco da un file."""
@@ -428,4 +428,9 @@ def load_game_session(request, filename):
     else:
         flash.add_message(request, flash.ERROR, "Errore nel caricamento della partita.")
 
-    return redirect(reverse("blamPunk:chat-dark"))
+    # Logica di reindirizzamento basata sul parametro 'app'
+    app_name = request.GET.get('app', 'blamPunk')
+    if app_name == 'bmovie':
+        return redirect(reverse("bmovie:chat"))
+    else:
+        return redirect(reverse("blamPunk:chat-dark"))

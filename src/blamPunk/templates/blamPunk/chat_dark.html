@@ -1,18 +1,36 @@
 {% extends "base.html" %}
 {% block title %} BLAM PUNK - {{ block.super }}{% endblock %}
+{% load static %}
+
+{% block extra_head %}
+  <meta name="description" content="Un'avventura AI immersiva nello stile cyber-distopico di Nihei. Sopravvivi o impazzisci.">
+  <meta property="og:title" content="Blam Punk - thedungeon.ai">
+  <meta property="og:description" content="Un'avventura AI immersiva nello stile cyber-distopico di Nihei. Sopravvivi o impazzisci.">
+  <meta property="og:image" content="{% static 'img/thedungeon-thumbnail.jpg' %}">
+  <meta property="og:url" content="https://www.thedungeon.ai/blampunk/chatdark">
+  <meta property="og:type" content="website">
+{% endblock %}
 
 {% block content %}
 
 {% if request.user.is_authenticated %}
+     <!-- HERO SECTION -->
+ 
+    <div class="mb-8">
+      <a href="/"><img src="{% static 'img/thedungeon-prova-logo.png' %}" alt="The Dungeon AI Logo" class="mx-auto max-h-12"></a>
+    </div>
+
 <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 px-6">
+
+
 
   <!-- CHAT PRINCIPALE -->
   <div class="md:col-span-3 space-y-4">
-    <h1 class="text-2xl font-bold text-green-400">💀 BLAM PUNK</h1>
+    <h1 class="text-2xl font-bold text-green-400">BLAM PUNK</h1>
            <!-- Pulsanti per caricare partita o fare una nuova partita -->
 <div class="flex items-center space-x-4 my-4">
     <!-- Pulsante "Carica Partita" (Verde) -->
-    <a href="{% url 'bmovie:load_game_list' %}"
+    <a href="{% url 'blamPunk:load_game_list' %}"
        class="bg-green-400 hover:bg-green-500 text-black font-bold py-2 px-4 rounded-lg transition-colors duration-200 ease-in-out no-underline">
         Carica Partita
     </a>

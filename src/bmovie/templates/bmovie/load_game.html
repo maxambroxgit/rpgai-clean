@@ -10,7 +10,7 @@
         <ul class="list-group">
             {% for game in saved_games %}
                 <li class="list-group-item">
-                    <a href="{% url 'bmovie:load_game_session' filename=game %}">
+                    <a href="{% url 'bmovie:load_game_session' filename=game %}?app={{ app_name }}">
                         {{ game }}
                     </a>
                 </li>
