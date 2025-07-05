@@ -38,10 +38,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <main class="flex-grow">
     <!-- Nel tuo template della homepage, per esempio alla fine del file -->
 
-{% if messages %}
-  {# Questo blocco legge i messaggi dalla sessione per "consumarli",
+{% if messages %} <!-- Questo blocco legge i messaggi dalla sessione per "consumarli",
      ma non produce alcun output visibile. Il codice in base.html
-     farà comunque il suo lavoro. #}
+     farà comunque il suo lavoro. -->
   {% for message in messages %}{% endfor %}
 {% endif %}
 
