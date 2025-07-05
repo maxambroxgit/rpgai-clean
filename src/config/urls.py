@@ -19,6 +19,7 @@ from django.views.generic import TemplateView
 from django.urls import path, include, reverse_lazy
 from django_registration.backends.one_step.views import RegistrationView
 from users.forms import customUserRegistrationForm
+from users.views import registration_complete_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,9 +33,8 @@ urlpatterns = [
         success_url=reverse_lazy("registration_complete")
     ),
         name = "djang_registration_register"),
-    path("accounts/register/complete/",
-        TemplateView.as_view(template_name="django_registration/registration_complete.html"),
-        name="registration_complete"
+    path("accounts/register/complete/", registration_complete_view, name='registration_complete'
+        #TemplateView.as_view(template_name="django_registration/registration_complete.html"),
     ),
 
 ]

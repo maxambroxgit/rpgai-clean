@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'home',
     'users',
     'bmovie',
-
  
     'widget_tweaks',
     'django_registration' #https://django-registration.readthedocs.io/en/stable/quickstart.html
@@ -86,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'users.context_processors.gtm_user_data'
             ],
         },
     },
@@ -163,5 +163,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 #EMAIL_HOST_USER = "EMAIL_HOST_USER"
 #EMAIL_HOST_PASSWORD = "EMAIL_HOST_PASSWORD" #https://myaccount.google.com/apppasswords
-DEFAULT_FROM_EMAIL = f"Cyber Dungeon - <{EMAIL_HOST_USER}>"
+DEFAULT_FROM_EMAIL = f"thedungeon.ai - <{EMAIL_HOST_USER}>"
 SIGNALS_DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL

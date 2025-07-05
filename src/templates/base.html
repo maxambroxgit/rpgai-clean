@@ -3,6 +3,14 @@
 {% load static %}
 {% load tz %}
 <head>
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWJV9NV');</script>
+<!-- End Google Tag Manager -->
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% block extra_head %}
@@ -22,8 +30,21 @@
 </head>
 
 <body class="bg-gray-900 text-gray-100 font-mono min-h-screen py-8 flex flex-col justify-between">
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWJV9NV"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
   <main class="flex-grow">
+    <!-- Nel tuo template della homepage, per esempio alla fine del file -->
+
+{% if messages %}
+  {# Questo blocco legge i messaggi dalla sessione per "consumarli",
+     ma non produce alcun output visibile. Il codice in base.html
+     farà comunque il suo lavoro. #}
+  {% for message in messages %}{% endfor %}
+{% endif %}
+
     {% block content %}{% endblock %}
   </main>
 
