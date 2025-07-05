@@ -37,12 +37,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <main class="flex-grow">
 
+    <!-- ========================================================== -->
+    <!--        BINVIO EVENTI A GTM - LOGIN e REGISTRAZIONE         -->
+    <!-- ========================================================== -->
     {% if messages %}
-  <!-- Questo ciclo 'consuma' i messaggi dalla sessione 
-  rendendoli disponibili per gli script in base.html -->
-  {% for message in messages %}
-  {% endfor %}
-{% endif %}
+      <script>
+        window.dataLayer = window.dataLayer || []; // Assicura che dataLayer esista
+        // Questo script viene eseguito solo se Django ha dei messaggi da mostrare.
+        {% for message in messages %}
+          // Per ogni messaggio, controlliamo se ha il tag speciale 'gtm_event'.
+          {% if 'gtm_event' in message.tags %}
+            // Se ce l'ha, stampiamo il messaggio nella console per debug
+            // e lo inviamo al dataLayer di GTM.
+            console.log("Messaggio GTM ricevuto da Django:", {{ message|safe }});
+            window.dataLayer.push({{ message|safe }});
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
+    <!-- ========================================================== -->
 
     {% block content %}{% endblock %}
   </main>
