@@ -54,8 +54,8 @@ INSTALLED_APPS = [
 
     'blamPunk',
     'home',
-    'users',
     'bmovie',
+    'users.apps.UsersConfig',
  
     'widget_tweaks',
     'django_registration' #https://django-registration.readthedocs.io/en/stable/quickstart.html
