@@ -96,6 +96,13 @@
     </div>
   </section>
 
+ 
+{% if messages %}
+  <!-- Questo ciclo 'consuma' i messaggi dalla sessione 
+  rendendoli disponibili per gli script in base.html -->
+  {% for message in messages %}
+  {% endfor %}
+{% endif %}
 
 
 {% endblock %}

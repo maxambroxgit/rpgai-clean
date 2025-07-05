@@ -36,12 +36,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
   <main class="flex-grow">
-    <!-- Nel tuo template della homepage, per esempio alla fine del file -->
 
-{% if messages %} <!-- Questo blocco legge i messaggi dalla sessione per "consumarli",
-     ma non produce alcun output visibile. Il codice in base.html
-     farà comunque il suo lavoro. -->
-  {% for message in messages %}{% endfor %}
+    {% if messages %}
+  <!-- Questo ciclo 'consuma' i messaggi dalla sessione 
+  rendendoli disponibili per gli script in base.html -->
+  {% for message in messages %}
+  {% endfor %}
 {% endif %}
 
     {% block content %}{% endblock %}
