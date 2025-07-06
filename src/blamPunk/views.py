@@ -36,7 +36,7 @@ from django.urls import reverse
 # Caricamento delle configurazioni dall'esterno
 API_KEY = config("API_KEY")
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
-MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+MODEL = "llama-3.3-70b-versatile"
 
 # Costanti del gioco
 LOG_DIR = "blamPunk/saves"

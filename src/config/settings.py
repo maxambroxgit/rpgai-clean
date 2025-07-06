@@ -56,10 +56,15 @@ INSTALLED_APPS = [
     'home',
     'bmovie',
     'users.apps.UsersConfig',
+
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
  
     'widget_tweaks',
     'django_registration' #https://django-registration.readthedocs.io/en/stable/quickstart.html
 ]
+
+SITE_ID = 1
 
 AUTH_USER_MODEL = "users.customUser"
 

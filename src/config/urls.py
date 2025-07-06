@@ -20,6 +20,19 @@ from django.urls import path, include, reverse_lazy
 from django_registration.backends.one_step.views import RegistrationView
 from users.forms import customUserRegistrationForm
 from users.views import registration_complete_view
+from django.contrib.sitemaps.views import sitemap
+from users.sitemaps import StaticViewSitemap, GameSitemap
+from django.views.generic.base import TemplateView # Importa TemplateView
+
+
+
+# Crea un dizionario che mappa un nome a ogni classe sitemap
+sitemaps = {
+    'static': StaticViewSitemap,
+    'games': GameSitemap,
+    # Se avessi una sitemap per modelli, la aggiungeresti qui:
+    # 'game-details': GameDetailSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,6 +48,13 @@ urlpatterns = [
         name = "djang_registration_register"),
     path("accounts/register/complete/", registration_complete_view, name='registration_complete'
         #TemplateView.as_view(template_name="django_registration/registration_complete.html"),
+    ),
+
+    path(
+        "sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap",
+    ),
+    path(
+        "robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")
     ),
 
 ]
