@@ -38,6 +38,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('blampunk/', include('blamPunk.urls', namespace="blamPunk")),
     path('bmovie/', include('bmovie.urls', namespace="bmovie")),
+    path('hacker-game/', include('hackergame.urls', namespace="hackergame")),
     path('', include('home.urls', namespace="home")),
     path("privacy/", TemplateView.as_view(template_name="privacy-policy.html"), name="privacy"),
     path('accounts/', include('django.contrib.auth.urls')),

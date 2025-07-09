@@ -37,7 +37,7 @@ Le funzionalità chiave includono:
 ## Dipendenze Notabili
 
 -   **Django**: Framework web Python.
--   **Groq API**: Utilizzata per l'interazione con il modello AI.
+-   **Open Router API**: Utilizzata per l'interazione con il modello AI.
 -   **`python-decouple`**: Per la gestione delle variabili d'ambiente (es. `API_KEY`).
 -   **`django-registration`**: Per la gestione della registrazione degli utenti.
 
@@ -59,3 +59,7 @@ Questo progetto offre un'interessante implementazione di giochi di ruolo testual
 -   **Correzione Pulsante "Carica Partita"**: Sistemato il link del pulsante "Carica Partita" nella pagina di chat di `blamPunk`, ora indirizza correttamente alla pagina di caricamento di `blamPunk`.
 -   **Link Homepage per Loghi**: Aggiunto un link alla homepage a tutte le istanze del logo `thedungeon-prova-logo.png` nei template HTML.
 -   **Integrazione Metatag SEO**: Implementati i metatag SEO nei template di chat di `blamPunk` (`chat_dark.html`) e `bmovie` (`chat.html`) tramite un nuovo blocco `extra_head` in `base.html`, permettendo la personalizzazione dei metatag per ciascuna app.
+
+### 2025-07-09
+
+-   **Uniformità API AI**: Le applicazioni `bmovie` e `hackergame` sono state aggiornate per utilizzare l'API di Open Router, allineandosi all'implementazione già presente in `blamPunk`. Questo garantisce una gestione centralizzata e coerente delle interazioni con l'intelligenza artificiale per tutti i giochi.

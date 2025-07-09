@@ -202,3 +202,4 @@ config/setup.json
 # Ignora i file di salvataggio delle sessioni
 src/blamPunk/saves/
 src/bzak/saves/
+src/hackergame/saves/

@@ -7,7 +7,7 @@ import random
 import re
 from datetime import datetime
 
-import requests
+from openai import OpenAI
 from decouple import config
 from django.contrib import messages as flash
 from django.http import JsonResponse
@@ -18,8 +18,8 @@ from django.urls import reverse
 
 # Caricamento delle configurazioni dall'esterno
 API_KEY = config("API_KEY")
-API_URL = "https://api.groq.com/openai/v1/chat/completions"
-MODEL = "llama-3.3-70b-versatile"
+API_URL = "https://openrouter.ai/api/v1/"
+MODEL = "google/gemini-2.0-flash-001"
 
 # Costanti del gioco
 LOG_DIR = "bzak/saves"
@@ -35,6 +35,9 @@ SESSION_STATS = "stats_bzak"
 SESSION_LEVEL = "level_bzak"
 SESSION_OBJECTIVES_COMPLETED = "objectives_completed_bzak"
 SESSION_CURRENT_OBJECTIVE = "objective_bzak"
+SESSION_MAX_HP = 'max_hp'
+HP_PER_LEVEL = 10
+
 
 # Dizionario dei consumabili
 CONSUMABILI = {
@@ -97,8 +100,9 @@ SYSTEM_PROMPT = (
     "- Chiudi la scena con un dilemma, un oggetto recuperato o una rivelazione."
 
     "Regole di interazione e risposta:"
-    "- Quando il giocatore perde punti ferita, rispondi con: 'Hai perso N punti ferita', dove N è il numero esatto."
-    "- Quando il giocatore raccoglie qualcosa, rispondi con: 'Hai raccolto l'oggetto'."
+    "GESTIONE PUNTI FERITA: Ogni volta che gli HP del giocatore cambiano (danno o guarigione), la tua risposta DEVE includere due informazioni: la causa del cambiamento E lo stato finale. "
+    "Usa il formato: '...testo narrativo... Hai perso/guarito N punti ferita. Punti ferita attuali: X."
+    "- Quando il giocatore raccoglie un oggetto, rispondi usando la sintassi 'Hai raccolto: [nome dell'oggetto]'. Sostituisci [nome dell'oggetto] con il nome dell'oggetto, senza usare articoli o virgolette."
     "- Guida la storia un passo alla volta e, alla fine di ogni scena, chiedi sempre: 'Cosa fai adesso?'"
 )
 
@@ -178,14 +182,16 @@ class GameManager:
         self.objectives_completed = session.get(SESSION_OBJECTIVES_COMPLETED, 0)
         self.current_objective = session.get(SESSION_CURRENT_OBJECTIVE, "")
         self.messages = session.get(SESSION_MESSAGES, [])
+        self.max_hp = session.get(SESSION_MAX_HP)
 
     def is_initialized(self):
         """Controlla se la sessione di gioco è già stata inizializzata."""
-        return self.hp is not None
+        return self.hp is not None and self.max_hp is not None
 
     def initialize_new_game(self):
         """Imposta i valori per una nuova partita."""
-        self.hp = STARTING_HP
+        self.max_hp = STARTING_HP
+        self.hp = self.max_hp
         self.inventory = []
         self.stats = INITIAL_STATS.copy()
         self.level = 1
@@ -193,7 +199,7 @@ class GameManager:
         self.current_objective = "Scopri dove ti trovi"
         self.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         
-        stato_hp = f"[INFO] Il personaggio ha attualmente {self.hp} punti ferita."
+        stato_hp = f"[INFO] Il personaggio ha attualmente {self.hp}/{self.max_hp} punti ferita."
         stato_inventario = f"[INFO] Il personaggio non possiede oggetti."
         self.messages.append({"role": "user", "content": f"{stato_hp} {stato_inventario}"})
 
@@ -206,6 +212,7 @@ class GameManager:
         self.session[SESSION_OBJECTIVES_COMPLETED] = self.objectives_completed
         self.session[SESSION_CURRENT_OBJECTIVE] = self.current_objective
         self.session[SESSION_MESSAGES] = self.messages
+        self.session[SESSION_MAX_HP] = self.max_hp
 
     def get_state_for_savefile(self):
         """Restituisce un dizionario con i dati da salvare su file."""
@@ -217,7 +224,13 @@ class GameManager:
             "stats": self.stats,
             "level": self.level,
             "objectives_completed": self.objectives_completed,
+            "max_hp": self.max_hp,
         }
+    
+    def heal_damage(self, amount):
+        """Aumenta gli HP del giocatore, senza superare il suo max_hp attuale."""
+        self.hp = min(self.max_hp, self.hp + amount)
+        return f"✨ Hai recuperato {amount} punti ferita! HP attuali: {self.hp}"
 
     def take_damage(self, amount):
         """Riduce gli HP del giocatore."""
@@ -232,15 +245,6 @@ class GameManager:
             return f"📦 Oggetto aggiunto all'inventario: {item}"
         return None
 
-    def use_item(self, item_name):
-        """Usa un oggetto consumabile dall'inventario."""
-        if item_name in self.inventory and item_name in CONSUMABILI:
-            healing_amount = CONSUMABILI[item_name]
-            self.hp = min(self.hp + healing_amount, STARTING_HP)
-            self.inventory.remove(item_name)
-            return f"💊 Hai usato '{item_name}' e recuperato {healing_amount} HP. HP attuali: {self.hp}"
-        return None
-
     def increment_objective_and_check_levelup(self):
         """Incrementa il contatore degli obiettivi e controlla se avviene un level up."""
         self.objectives_completed += 1
@@ -253,13 +257,15 @@ class GameManager:
             for stat_name in self.stats:
                 self.stats[stat_name] += 1
             
-            self.hp += 10
+            old_max_hp = self.max_hp
+            self.max_hp += HP_PER_LEVEL # Aumenta il massimo
+            self.hp = self.max_hp # Guarigione completa al nuovo massimo
             
             return (
                 f"🎉 **LEVEL UP!** 🎉\n"
                 f"Hai raggiunto il livello **{self.level}**!\n"
                 f"Le tue statistiche sono aumentate! Ora sono: {self.stats}.\n"
-                f"I tuoi HP sono stati ricaricati e aumentati a {self.hp}!"
+                f"I tuoi HP massimi sono ora {self.max_hp} (erano {old_max_hp}) e sei stato guarito completamente!"
             )
         return None
 
@@ -269,7 +275,7 @@ class GameManager:
         skill_name = match.group(1).capitalize() if match else "Generico"
         
         roll = random.randint(1, 20)
-        modifier = self.stats.get(skill_name, 0)
+        modifier = self.stats.get(skill_name.lower(), 0)
         total = roll + modifier
 
         roll_result = f"**TIRO D20 ({skill_name}): {roll} + {modifier} = {total}**"
@@ -279,21 +285,24 @@ class GameManager:
 # --- LIVELLO DI SERVIZIO (Service Layer) ---
 
 def get_ai_response(messages):
-    """Invia i messaggi all'API di Groq e restituisce la risposta."""
+    """Invia i messaggi all'API di OpenRouter e restituisce la risposta."""
     try:
-        response = requests.post(
-            API_URL,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {API_KEY}"
+        client = OpenAI(
+            base_url=API_URL,
+            api_key=API_KEY,
+        )
+        completion = client.chat.completions.create(
+            extra_headers={
+                "HTTP-Referer": "http://localhost",  # Optional. Site URL for rankings on openrouter.ai.
+                "X-Title": "BMovie RPG",  # Optional. Site title for rankings on openrouter.ai.
             },
-            json={"model": MODEL, "messages": messages},
+            model=MODEL,
+            messages=messages,
             timeout=30
         )
-        response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
-    except requests.RequestException as e:
-        logger.error(f"Errore nella chiamata API a Groq: {e}")
+        return completion.choices[0].message.content
+    except Exception as e:
+        logger.error(f"Errore nella chiamata API: {e}")
         return None
 
 
@@ -350,17 +359,41 @@ def chat_view(request):
 
 def parse_ai_reply(request, reply, game):
     """Esegue il parsing della risposta dell'AI e aggiorna lo stato del gioco."""
-    damage_match = re.search(r"Hai perso\s+(\d+)\s+punti ferita", reply, re.IGNORECASE)
-    if damage_match:
-        damage = int(damage_match.group(1))
-        message = game.take_damage(damage)
-        flash.add_message(request, flash.WARNING, message)
+    
+    # --- NUOVA LOGICA ROBUSTA PER GLI HP ---
+    # Cerca prima uno stato assoluto, che è più affidabile.
+    hp_status_match = re.search(r"(?:Punti ferita|HP) attuali:\s*(\d+)", reply, re.IGNORECASE)
+    
+    if hp_status_match:
+        # Se l'AI ci dice gli HP finali, sincronizziamo direttamente lo stato.
+        new_hp = int(hp_status_match.group(1))
+        game.hp = min(new_hp, game.max_hp) # Usiamo min() per sicurezza, non si sa mai
+    else:
+        # Altrimenti, cerchiamo i cambiamenti relativi (danno o guarigione).
+        damage_match = re.search(r"Hai perso\s+(\d+)\s+punti ferita", reply, re.IGNORECASE)
+        if damage_match:
+            damage = int(damage_match.group(1))
+            game.take_damage(damage)
+            flash.add_message(request, flash.WARNING, f"Hai perso {damage} HP!")
 
-    item_match = re.findall(r"Hai raccolto\s+(?:un[oa]?|il|lo|la|le|gli|i)\s+([\w\s]+?)(?:\.|\n|$)", reply, re.IGNORECASE)
-    for item in item_match:
-        message = game.add_to_inventory(item)
-        if message:
-            flash.add_message(request, flash.INFO, message)
+        heal_match = re.search(r"Hai guarito\s+(\d+)\s+punti ferita", reply, re.IGNORECASE)
+        if heal_match:
+            amount_healed = int(heal_match.group(1))
+            game.heal_damage(amount_healed)
+            flash.add_message(request, flash.INFO, f"Hai recuperato {amount_healed} HP!")
+            
+    # --- FINE NUOVA LOGICA HP ---
+
+    # Parsing oggetti raccolti
+    collected_match = re.search(r"Hai raccolto:?\s*(?:un'|un|una|il|lo|la|i|gli|le)?\s*(.*?)\.", reply, re.IGNORECASE)
+    if collected_match:
+        items_string = collected_match.group(1)
+        # Split by '*' and filter out empty strings
+        items = [item.strip() for item in items_string.split('*') if item.strip()]
+        for item in items:
+            message = game.add_to_inventory(item)
+            if message:
+                flash.add_message(request, flash.INFO, message)
 
     obj_match = re.search(r"\[OBJECTIVE\]\s*(.*)", reply, re.IGNORECASE)
     if obj_match:

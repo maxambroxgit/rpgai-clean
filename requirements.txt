@@ -3,3 +3,4 @@ django-registration>=3.3
 django-tailwind>=3.6.0
 requests>=2.31
 python-decouple
+openai

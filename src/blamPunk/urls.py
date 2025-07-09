@@ -1,7 +1,7 @@
 from django.urls import path
 from blamPunk import views
 
-app_name = "blamPunk"
+app_name = "hackergame"
 
 urlpatterns = [
 path('chatdark/', views.chat_view, name='chat-dark'),

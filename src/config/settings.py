@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'blamPunk',
     'home',
     'bmovie',
+    'hackergame',
     'users.apps.UsersConfig',
 
     'django.contrib.sites',
