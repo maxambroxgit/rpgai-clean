@@ -100,7 +100,7 @@ SYSTEM_PROMPT = (
     "- Chiudi la scena con un dilemma, un oggetto recuperato o una rivelazione."
 
     "Regole di interazione e risposta:"
-    "GESTIONE PUNTI FERITA: Ogni volta che gli HP del giocatore cambiano (danno o guarigione), la tua risposta DEVE includere due informazioni: la causa del cambiamento E lo stato finale. "
+    "GESTIONE PUNTI FERITA: Ogni volta che gli HP del giocatore cambiano (danno o guarigione), la tua risposta DEVE includere due informazioni: la causa del cambiamento E lo stato finale."
     "Usa il formato: '...testo narrativo... Hai perso/guarito N punti ferita. Punti ferita attuali: X."
     "- Quando il giocatore raccoglie un oggetto, rispondi usando la sintassi 'Hai raccolto: [nome dell'oggetto]'. Sostituisci [nome dell'oggetto] con il nome dell'oggetto, senza usare articoli o virgolette."
     "- Guida la storia un passo alla volta e, alla fine di ogni scena, chiedi sempre: 'Cosa fai adesso?'"
