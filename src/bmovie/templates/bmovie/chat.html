@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %} B-MOVIE - {{ block.super }}{% endblock %}
+{% block title %} BZak McKracken - {{ block.super }}{% endblock %}
 
 
 {% block extra_head %}
@@ -21,7 +21,7 @@
 
   <!-- CHAT PRINCIPALE -->
   <div class="md:col-span-3 space-y-4">
-    <h1 class="text-2xl font-bold text-green-400">B-Movie</h1>
+    <h1 class="text-4xl font-bold text-green-400">BZak McKrackene</h1>
         <!-- Pulsanti per caricare partita o fare una nuova partita -->
 <div class="flex items-center space-x-4 my-4">
     <!-- Pulsante "Carica Partita" (Verde) -->
@@ -37,10 +37,14 @@
     </a>
 </div>
 
-    <h2>In una città apparentemente normale, dove il traffico scorre lento e le offerte dei supermercati sembrano più spaventose delle notizie del telegiornale, si nasconde un mondo invisibile agli occhi dei più.
-        Gli investigatori che si avventurano in questo ecosistema impazzito sanno che la verità non solo è là fuori, ma ha anche un pessimo senso dell’umorismo. Sei pronto ad investigare?
-    </h3>
-    <h1>Cosa fai?</h1>
+    <h3 class="text-2xl font-bold text-green-400">COME GIOCARE</h3>
+        <p> "Sei un investigatore privato, e la mattina leggi il The National Inquisitor, per capire su quali casi indagare per sbarcare il lunario, scegli un caso e inizi ad indagare".
+        BZak, è un tipo smilzo, semi-atletico, arguto a sufficienza, ha baffi alla groucho marx.<br>
+        <br>
+        Non ci sono passaggi di livello, l'unica caratteristica che ha questo personaggio è: "fortuna", per cui il tuo obiettivo è indagare e non impazzire.</p>
+   <h3 class="text-2xl font-bold text-green-400">TIRARE IL DADO</h3>
+    <h3>Scrivi `tiro fortuna` nella tua azione per tirare il dado.</h3>
+    <p class="text-green-400">Inizia la tua avventura, cosa fai?</p>
 
 
 
@@ -146,8 +150,11 @@
   <div class="space-y-4 bg-gray-800 p-4 rounded border border-gray-700">
     <h2 class="text-lg font-semibold text-gray-100">📊 Stato</h2>
     <p><strong class="text-red-400">HP:</strong> {{ hp }}</p>
-    <p><strong>Livello:</strong> {{ level }}</p>
     <p><strong>Obiettivo:</strong> <span class="text-gray-400">{{ objective }}</span></p>
+    <h3 class="text-lg font-semibold text-gray-100 pt-2">⭐ Caratteristiche</h3>
+        {% for stat, value in stats.items %}
+    <p class="text-gray-400">{{ stat|capfirst }}: {{ value }}</p>
+        {% endfor %}
 
     <!-- INVENTARIO -->
     <h3 class="text-lg font-semibold text-gray-100">🎒 Inventario</h3>

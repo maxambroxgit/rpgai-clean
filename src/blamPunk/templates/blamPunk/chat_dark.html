@@ -27,7 +27,7 @@
 
   <!-- CHAT PRINCIPALE -->
   <div class="md:col-span-3 space-y-4">
-    <h1 class="text-2xl font-bold text-green-400">BLAM PUNK</h1>
+    <h1 class="text-4xl font-bold text-green-400">BLAM PUNK</h1>
            <!-- Pulsanti per caricare partita o fare una nuova partita -->
 <div class="flex items-center space-x-4 my-4">
     <!-- Pulsante "Carica Partita" (Verde) -->
@@ -42,11 +42,20 @@
         Nuova Partita
     </a>
 </div>
-    <h2>Benvenuto nel Cyber Labirinto. Dove ti trovi non lo sai, nel centro di detenzione di un'astronave che viaggia senza meta nello spazio, 
+    <h3 class="text-2xl font-bold text-green-400">COME GIOCARE</h3>
+        <p> Benvenuto nel Cyber Labirinto. Dove ti trovi non lo sai, nel centro di detenzione di un'astronave che viaggia senza meta nello spazio, 
         nelle profondità più recondite del pianeta terra, in una stazione orbitante intorno a uno dei satelliti di Giove o forse in una 
-        simulazione virtuale iper-realistica in cui, come un simulacro disperato, ti muovi cercando una spiegazione a questa follia.</h2>
-    <h3>Scrivi `d20` nella tua azione per tirare il dado.</h3>
-    <h1>Ed ora cosa fai?</h1>
+        simulazione virtuale iper-realistica in cui, come un simulacro disperato, ti muovi cercando una spiegazione a questa follia.<br>
+        <br>
+        Sei un investigatore privato, ma non è scontato che rimarrai tale, a seconda delle tue azioni durante il gioco, potresti
+        modificare la tua natura, le tue azioni influenzeranno le decisioni del DM, quindi fati attenzione!</p>
+    <h3 class="text-2xl font-bold text-green-400">PASSAGGIO DI LIVELLO</h3>
+        <p>Il passaggio di livello è legato al raggiungimento degli obiettivi, il secondo livello lo raggiungerai dopo aver completato 10 obiettivi,
+            ovviemanete devi rimanere vivo. Successivamente, il numero di obiettivi aumenterà per passare di livello.
+        </p>
+    <h3 class="text-2xl font-bold text-green-400">TIRARE IL DADO</h3>
+        <p>Scrivi `tiro cervello`, oppure 'tiro fegato', oppure 'tiro [nome caratteristica]' nella tua azione per tirare il dado.</p>
+    <p class="text-green-400">Inizia la tua avventura, cosa fai?</p>
 
 <!-- Notifiche / Messaggi Flash - VERSIONE CORRETTA -->
 {% if messages %}
@@ -159,6 +168,10 @@
     <p><strong class="text-red-400">HP:</strong> {{ hp }}</p>
     <p><strong>Livello:</strong> {{ level }}</p>
     <p><strong>Obiettivo:</strong> <span class="text-gray-400">{{ objective }}</span></p>
+    <h3 class="text-lg font-semibold text-gray-100 pt-2">⭐ Caratteristiche</h3>
+    {% for stat, value in stats.items %}
+    <p class="text-gray-400">{{ stat|capfirst }}: {{ value }}</p>
+    {% endfor %}
 
     <!-- INVENTARIO -->
     <h3 class="text-lg font-semibold text-gray-100">🎒 Inventario</h3>

@@ -42,14 +42,16 @@
         Nuova Partita
     </a>
 </div>
-    <h2>Non ricordi come sei entrato. Si dice che nessuno sia mai riuscito ad uscire. 
-        La Megastruttura ti ha inghiottito tempo fa. O forse sei nato qui. Corridoi infiniti, megaplast e silicio. 
-        Macchine che sussurrano in linguaggi morti. Sei un hacker. 
-        L'ultimo umano. O il prossimo da disassemblare. Ogni nodo è un enigma. 
-        Ogni terminale, una trappola logica. Devi violare per sopravvivere. Devi decifrare per avanzare. 
-        Davanti a te, un terminale vivo si apre nella parete, pulsante come carne sintetica. Il cursore lampeggia e il prompt ti sta aspettando.</h2>
-    <h3>Scrivi `tiro` nella tua azione per tirare il dado.</h3>
-    <h1>Ed ora cosa fai?</h1>
+    <h3 class="text-2xl font-bold text-green-400">COME GIOCARE</h3>
+        <p>Non ricordi come sei entrato. Sei un hacker. L'ultimo umano. O il prossimo da disassemblare. 
+            Ogni nodo è un enigma. Ogni terminale, una trappola logica. Devi violare per sopravvivere. 
+            Devi decifrare per avanzare. Davanti a te, un terminale vivo si apre nella parete, pulsante come carne sintetica. 
+            Il cursore lampeggia e il prompt ti sta aspettando.<br>
+        <br>
+        Non ci sono passaggi di livello, l'unica caratteristica che hai è: "Cervello".</p>
+    <h3 class="text-2xl font-bold text-green-400">TIRARE IL DADO</h3>
+    <h3>Nessun tiro di dato previsto, per sopravvivere devi solo e soltanto violare.</h3>
+        <p class="text-green-400">Inizia la tua avventura, cosa fai?</p>
 
 <!-- Notifiche / Messaggi Flash - VERSIONE CORRETTA -->
 {% if messages %}
@@ -158,37 +160,7 @@
 
   <!-- SIDEBAR: STATO DI GIOCO -->
   <div class="space-y-4 bg-gray-800 p-4 rounded border border-gray-700">
-    <h2 class="text-lg font-semibold text-gray-100">📊 Stato</h2>
-    <p><strong class="text-red-400">HP:</strong> {{ hp }}</p>
-    <p><strong>Livello:</strong> {{ level }}</p>
-    <p><strong>Obiettivo:</strong> <span class="text-gray-400">{{ objective }}</span></p>
-
-    <!-- INVENTARIO -->
-    <h3 class="text-lg font-semibold text-gray-100">🎒 Inventario</h3>
-    {% if inventory %}
-        <ul class="list-disc list-inside text-gray-300 text-sm">
-            {% for item in inventory %}
-                <li>{{ item|capfirst }}</li>
-            {% endfor %}
-        </ul>
-
-        <!-- MENU OGGETTI CONSUMABILI -->
-        <form method="post" class="mt-4 space-y-2">
-            {% csrf_token %}
-            <label for="use_item" class="text-sm text-gray-400">💊 Usa oggetto</label>
-            <select name="use_item" id="use_item" class="w-full bg-gray-700 border border-gray-600 text-white rounded p-2 text-sm">
-                <option value="">— Seleziona —</option>
-                {% for item in inventory %}
-                    {% if item in "medikit,siringa,kit di pronto soccorso" %}
-                        <option value="{{ item }}">{{ item|capfirst }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-            <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded">Usa</button>
-        </form>
-    {% else %}
-        <p class="text-sm italic text-gray-400">Nessun oggetto</p>
-    {% endif %}
+   
 
     <!-- LOGOUT -->
     <form method="POST" action="{% url 'logout' %}" class="mt-6">

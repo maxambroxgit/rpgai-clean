@@ -38,11 +38,20 @@ API_KEY = config("API_KEY")
 API_URL = "https://openrouter.ai/api/v1/"
 MODEL = "google/gemini-2.0-flash-001"
 
+# Classi del personaggio che cambiano a seconda delle azioni di gioco
+ARCHETYPES = {
+    "Investigatore": {"bonus_stat": "cervello", "desc": "Sei un maestro dell'analisi e della deduzione."},
+    "Bruto": {"bonus_stat": "fegato", "desc": "Risolvi i problemi con la forza bruta."},
+    "Assassino": {"bonus_stat": "prontezza", "desc": "Colpisci dall'ombra, veloce e letale."},
+    "Scavenger": {"bonus_stat": "cervello", "desc": "Sei un esperto nel trovare e riadattare la tecnologia perduta."},
+    "Oratore": {"bonus_stat": "carisma", "desc": "La tua arma è la parola, capace di persuadere o ingannare."},
+}
+
 # Costanti del gioco
 LOG_DIR = "blamPunk/saves"
 STARTING_HP = 20
 MAX_SAVE_FILES = 10  # Limite massimo di file di salvataggio per utente
-INITIAL_STATS = {"Carisma": 2, "Prontezza": 1, "Cervello": 3, "Fegato": 0}
+INITIAL_STATS = {"Carisma": 2, "Prontezza": 1, "Cervello": 3, "Fegato": 1}
 
 # Costanti per le chiavi di sessione (evita "stringhe magiche")
 SESSION_MESSAGES = "blame_messages"
@@ -54,6 +63,7 @@ SESSION_OBJECTIVES_COMPLETED = "objectives_completed"
 SESSION_CURRENT_OBJECTIVE = "objective"
 SESSION_MAX_HP = 'max_hp'
 HP_PER_LEVEL = 10
+SESSION_PLAYER_CLASS = "player_class"
 
 # System prompt per l'AI, separato dalla logica della vista
 SYSTEM_PROMPT = (
@@ -64,13 +74,33 @@ SYSTEM_PROMPT = (
     "Non descrivere te stesso come un'AI. Il giocatore è l'unico umano conosciuto. "
     "GESTIONE PUNTI FERITA: Ogni volta che gli HP del giocatore cambiano (danno o guarigione), la tua risposta DEVE includere due informazioni: la causa del cambiamento E lo stato finale. "
     "Usa il formato: '...testo narrativo... Hai perso/guarito N punti ferita. Punti ferita attuali: X."
-    "Quando il giocatore raccoglie un oggetto, rispondi usando la sintassi 'Hai raccolto: [nome dell'oggetto]'. Sostituisci [nome dell'oggetto] con il nome dell'oggetto, senza usare articoli o virgolette. "
+    "Quando il giocatore raccoglie un oggetto, la tua risposta DEVE includere la frase esatta Hai raccolto: nomeoggetto. terminata da un punto. NON usare parentesi. Se vengono raccolti più oggetti contemporaneamente, separali con una virgola. Esempio: Hai raccolto: Pistola, Coltello da cucina, Gancio da traino."
     "Guida la storia un passo alla volta e, alla fine di ogni scena, chiedi: 'Cosa fai adesso?'."
-    "Quando il giocatore tenta un'azione incerta (persuadere, schivare, indagare), richiedi un tiro di abilità (es. 'Fai un tiro di Carisma'). "
-    "Il giocatore deve rispondere includendo la parola 'tiro' oppure 'd20' e il nome dell'abilità (es. 'tiro Carisma'). "
+    "Qualsiasi azione intrapresa dal giocatore che abbia una possibilità di fallimento DEVE essere risolta chiedendo un tiro di abilità. Questo include, ma non è limitato a: attaccare una creatura, persuadere un personaggio, nascondersi, scassinare una serratura, indagare su un macchinario complesso, o schivare un pericolo. MAI decidere autonomamente l'esito di un attacco o di un'azione complessa. Chiedi sempre un tiro, ad esempio: 'È un gesto avventato. Fai un tiro di Prontezza per vedere se riesci a colpirlo prima che reagisca'."
+    "Il giocatore deve rispondere includendo la parola 'tiro' oppure 'd20' e il nome dell'abilità (es. 'tiro Carisma')."
     "Il sistema calcolerà automaticamente il risultato del dado. Non chiedere MAI al giocatore di fornire il risultato numerico di un tiro."
-    "Quando un obiettivo importante viene completato o uno nuovo viene scoperto, comunicalo usando la stringa speciale: [OBJECTIVE] Il nuovo obiettivo è..."
-)
+   
+    "GESTIONE DEGLI OBIETTIVI E DELLA PROGRESSIONE"
+    "Il tag [OBJECTIVE] rappresenta la missione principale del giocatore, non la sua prossima azione. La sua complessità DEVE aumentare con il livello del giocatore. Usa le informazioni del [CONTESTO PARTITA] per calibrare gli obiettivi."
+    "Regola Fondamentale: NON creare un nuovo [OBJECTIVE] dopo ogni singola risposta. Un nuovo obiettivo deve essere generato solo quando la missione precedente, che potrebbe richiedere molte azioni per essere completata, è stata portata a termine."
+    "Esempi di Come la Complessità Deve Evolvere:"
+    "Livelli Bassi (1-4): Gli obiettivi sono compiti diretti, ma non banali. Richiedono 2-3 azioni."
+    "NON FARE: [OBJECTIVE] Avvicinati alla figura. (Troppo semplice)"
+    "FAI QUESTO: [OBJECTIVE] Scopri la natura e le intenzioni della figura nel corridoio. (Richiede di avvicinarsi, osservare, forse interagire)."
+    "Livelli Intermedi (5-9): Gli obiettivi diventano missioni a più fasi. Richiedono esplorazione e risoluzione di problemi."
+    "NON FARE: [OBJECTIVE] Raccogli la scheda magnetica."
+    "FAI QUESTO: [OBJECTIVE] Trova un modo per superare la porta sigillata del Settore Gamma. (La soluzione potrebbe essere trovare una scheda, hackerare un terminale o trovare un condotto di ventilazione)."
+    "Livelli Alti (10+): Gli obiettivi sono missioni a lungo termine che possono definire un intero capitolo della storia."
+    "NON FARE: [OBJECTIVE] Premi il pulsante rosso."
+    "FAI QUESTO: [OBJECTIVE] Raggiungi la sala di controllo centrale e disattiva il segnale di purificazione della Megastruttura."
+    
+
+
+    "ANALISI DELLO STILE DI GIOCO E CAMBIO DI CLASSE: Il personaggio del giocatore non è statico. La sua classe iniziale è solo un punto di partenza. Analizza costantemente le azioni del giocatore (combattimento, dialogo, esplorazione)."
+    "Se noti che il suo comportamento si allinea costantemente con un nuovo archetipo, DEVI segnalarlo. Usa il formato speciale: [CLASS_CHANGE] NuovoArchetipo. Fallo in un momento narrativamente appropriato, come dopo un'azione particolarmente significativa o durante un level up."
+    "Esempio: Se un Investigatore ha passato le ultime 5 scene a sparare a vista, dopo un combattimento potresti scrivere: '...i bossoli cadono sul pavimento metallico. Il tuo modo di agire è cambiato. Non sei più solo un cercatore di verità. [CLASS_CHANGE] Assassino'."
+    "Scegli l'archetipo da questa lista: Investigatore, Bruto, Assassino, Scavenger, Oratore."
+)   
 
 # Configurazione del logger
 logger = logging.getLogger(__name__)
@@ -160,6 +190,7 @@ class GameManager:
         self.current_objective = session.get(SESSION_CURRENT_OBJECTIVE, "")
         self.messages = session.get(SESSION_MESSAGES, [])
         self.max_hp = session.get(SESSION_MAX_HP)
+        self.player_class = session.get(SESSION_PLAYER_CLASS, "Investigatore")
 
     def is_initialized(self):
         """Controlla se la sessione di gioco è già stata inizializzata."""
@@ -176,6 +207,7 @@ class GameManager:
         self.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         self.max_hp = STARTING_HP
         self.hp = self.max_hp
+        self.player_class = "Investigatore"
         
         # Aggiunge le informazioni iniziali come primo messaggio
         stato_hp = f"[INFO] Il personaggio ha attualmente {self.hp} / {self.max_hp} punti ferita."
@@ -192,6 +224,7 @@ class GameManager:
         self.session[SESSION_CURRENT_OBJECTIVE] = self.current_objective
         self.session[SESSION_MESSAGES] = self.messages
         self.session[SESSION_MAX_HP] = self.max_hp
+        self.session[SESSION_PLAYER_CLASS] = self.player_class
 
     def get_state_for_savefile(self):
         """Restituisce un dizionario con i dati da salvare su file."""
@@ -204,8 +237,30 @@ class GameManager:
             "level": self.level,
             "objectives_completed": self.objectives_completed,
             "max_hp": self.max_hp,
+            "player_class": self.player_class,
         }
     
+    def change_class(self, new_class_name):
+        """Cambia la classe del giocatore e applica i bonus associati."""
+        new_class_name = new_class_name.capitalize()
+        
+        if new_class_name == self.player_class or new_class_name not in ARCHETYPES:
+            return None # Nessun cambiamento o classe non valida
+
+        self.player_class = new_class_name
+        bonus_stat = ARCHETYPES[new_class_name]["bonus_stat"]
+        
+        # Applica un bonus permanente alla statistica primaria della nuova classe
+        if bonus_stat in self.stats:
+            self.stats[bonus_stat] += 1
+            
+        description = ARCHETYPES[new_class_name]["desc"]
+        return (
+            f"🌀 **Il tuo approccio è cambiato.** Ora sei un **{new_class_name}**.\n"
+            f"{description}\n"
+            f"Hai ottenuto un bonus permanente di +1 a **{bonus_stat.capitalize()}**!"
+        )
+        
     def heal_damage(self, amount):
         """Aumenta gli HP del giocatore, senza superare il suo max_hp attuale."""
         self.hp = min(self.max_hp, self.hp + amount)
@@ -252,20 +307,62 @@ class GameManager:
             )
         return None
 
+        # TIRO DEL DADO
     def process_dice_roll(self, user_input):
         """Gestisce un tiro di dado e lo formatta."""
         match = re.search(r"tiro\s+(\w+)", user_input, re.IGNORECASE)
-        skill_name = match.group(1).capitalize() if match else "Generico"
-        
+        skill_name_raw = match.group(1).strip().capitalize() if match else "Generico"
+        skill_name_lower = skill_name_raw.lower()
+
+        # 1. Definiamo le statistiche di base per un controllo pulito.
+        CORE_STATS_LIST = ["carisma", "prontezza", "cervello", "fegato"]
+
+         # 2. Controlliamo PRIMA se l'abilità richiesta è già una statistica di base.
+        if skill_name_lower in CORE_STATS_LIST:
+            core_stat_name = skill_name_lower.capitalize()
+        else:
+            # 3. ALTRIMENTI, consultiamo la mappa per le abilità creative.
+            SKILL_MAP = {
+                #mappatura per Prontezza
+                "pistola": "Prontezza",
+                "mira": "Prontezza", 
+                "agilità": "Prontezza",                 
+                "schivata": "Prontezza",
+                #mappatura per Cervello
+                "hackerare": "Cervello",
+                "indagare": "Cervello",
+                "riparare": "Cervello",
+                "intelligenza": "Cervello",
+                "intuizione": "Cervello",
+                #mappatura per Carisma
+                "persuadere": "Carisma",
+                "intimidire": "Carisma",
+                #mappatura per Fegato
+                "forza bruta": "Fegato",
+                "resistere": "Fegato",
+                "forza": "Fegato",
+            }
+            # Se non la troviamo nella mappa, usiamo Cervello come default per abilità sconosciute.
+            core_stat_name = SKILL_MAP.get(skill_name_lower, "Cervello").capitalize()
+
+
+        modifier = self.stats.get(core_stat_name.lower(), 0)
+       
         roll = random.randint(1, 20)
-        modifier = self.stats.get(skill_name.lower(), 0)
         total = roll + modifier
 
-        roll_result = f"**TIRO D20 ({skill_name}): {roll} + {modifier} = {total}**"
+        roll_result = (
+            f"**TIRO {skill_name_raw.upper()} (usa {core_stat_name}): "
+            f"{roll} + {modifier} = {total}**"
+    )
         return roll_result
+    
+    
 
 
 # --- LIVELLO DI SERVIZIO (Service Layer) ---
+
+
 
 def get_ai_response(messages):
     """Invia i messaggi all'API di OpenRouter e restituisce la risposta."""
@@ -315,14 +412,29 @@ def chat_view(request):
             user_input = request.POST.get("user_input", "").strip()
             if user_input:
                 # Gestione tiro di dado
-                # Gestione tiro di dado
                 if "tiro" in user_input.lower():
                     user_input = game.process_dice_roll(user_input)
 
                 game.messages.append({"role": "user", "content": user_input})
                 
                 # Chiamata all'AI
-                reply = get_ai_response(game.messages)
+                 # 1. Crea una copia temporanea dei messaggi per non sporcare la cronologia reale
+                messages_for_ai = list(game.messages)
+                
+                # 2. Crea il messaggio di contesto usando l'oggetto 'game' che è già definito qui
+                context_message = (
+                    f"[CONTESTO PARTITA] Il giocatore è di livello {game.level}. "
+                    f"Ha {game.hp}/{game.max_hp} HP. "
+                    f"Inventario: {', '.join(game.inventory) or 'vuoto'}. "
+                    f"Crea una sfida appropriata per il suo livello."
+                )
+                
+                # 3. Aggiungi il messaggio di contesto alla lista temporanea.
+                #    Lo inseriamo come ruolo "user" così l'AI lo leggerà come un'istruzione diretta.
+                messages_for_ai.append({"role": "user", "content": context_message})
+
+                # 4. Chiama l'AI usando la lista di messaggi "arricchita"
+                reply = get_ai_response(messages_for_ai)
                 
                 if reply:
                     game.messages.append({"role": "assistant", "content": reply})
@@ -382,16 +494,29 @@ def parse_ai_reply(request, reply, game):
             
     # --- FINE NUOVA LOGICA HP ---
 
+    # --- NUOVA LOGICA PER IL CAMBIO DI CLASSE ---
+    class_match = re.search(r"\[CLASS_CHANGE\]\s*(\w+)", reply, re.IGNORECASE)
+    if class_match:
+        new_class = class_match.group(1)
+        message = game.change_class(new_class)
+        if message:
+            flash.add_message(request, flash.SUCCESS, message)
+
     # Parsing oggetti raccolti
-    collected_match = re.search(r"Hai raccolto:?\s*(?:un'|un|una|il|lo|la|i|gli|le)?\s*(.*?)\.", reply, re.IGNORECASE)
+    collected_match = re.search(r"Hai raccolto:?\s*([^\]\.\[]+)", reply, re.IGNORECASE)
     if collected_match:
         items_string = collected_match.group(1)
-        # Split by '*' and filter out empty strings
-        items = [item.strip() for item in items_string.split('*') if item.strip()]
-        for item in items:
-            message = game.add_to_inventory(item)
-            if message:
-                flash.add_message(request, flash.INFO, message)
+        items_list = items_string.split(',')
+
+    # 3. Itera su ogni elemento della lista.
+        for item in items_list:
+            # 4. Pulisci ogni singolo oggetto da spazi bianchi extra e assicurati che non sia vuoto.
+            clean_item = item.strip()
+            if clean_item:
+                # 5. Aggiungi l'oggetto pulito all'inventario.
+                message = game.add_to_inventory(clean_item)
+                if message:
+                    flash.add_message(request, flash.INFO, message)
 
     # Parsing OBIETTIVI
     obj_match = re.search(r"\[OBJECTIVE\]\s*(.*)", reply, re.IGNORECASE)
@@ -403,12 +528,14 @@ def parse_ai_reply(request, reply, game):
         levelup_message = game.increment_objective_and_check_levelup()
         if levelup_message:
             flash.add_message(request, flash.SUCCESS, levelup_message)
+            info_message_for_ai = f"[INFO DI GIOCO] {levelup_message}"
+            game.messages.append({"role": "user", "content": info_message_for_ai})
 
 def reset_session(request):
     """Pulisce la sessione di gioco e reindirizza alla chat."""
     keys_to_clear = [
         SESSION_MESSAGES, SESSION_HP, SESSION_INVENTORY, SESSION_STATS,
-        SESSION_LEVEL, SESSION_OBJECTIVES_COMPLETED, SESSION_CURRENT_OBJECTIVE
+        SESSION_LEVEL, SESSION_OBJECTIVES_COMPLETED, SESSION_CURRENT_OBJECTIVE, SESSION_PLAYER_CLASS
     ]
     for key in keys_to_clear:
         request.session.pop(key, None)
@@ -448,6 +575,7 @@ def load_game_session(request, filename):
         request.session[SESSION_LEVEL] = session_data.get("level", 1)
         request.session[SESSION_OBJECTIVES_COMPLETED] = session_data.get("objectives_completed", 0)
         request.session[SESSION_CURRENT_OBJECTIVE] = session_data.get("objective", "")
+        request.session[SESSION_PLAYER_CLASS] = session_data.get("player_class", "")
         
         flash.add_message(request, flash.SUCCESS, f"Partita '{filename}' caricata con successo!")
     else:
