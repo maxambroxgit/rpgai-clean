@@ -315,7 +315,7 @@ class GameManager:
         skill_name_lower = skill_name_raw.lower()
 
         # 1. Definiamo le statistiche di base per un controllo pulito.
-        CORE_STATS_LIST = ["carisma", "prontezza", "cervello", "fegato"]
+        CORE_STATS_LIST = ["Carisma", "Prontezza", "Cervello", "Fegato"]
 
          # 2. Controlliamo PRIMA se l'abilità richiesta è già una statistica di base.
         if skill_name_lower in CORE_STATS_LIST:

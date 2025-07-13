@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'bmovie',
     'hackergame',
     'users.apps.UsersConfig',
+    'ade',
 
     'django.contrib.sites',
     'django.contrib.sitemaps',

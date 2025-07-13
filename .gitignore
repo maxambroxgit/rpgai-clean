@@ -203,3 +203,4 @@ config/setup.json
 src/blamPunk/saves/
 src/bzak/saves/
 src/hackergame/saves/
+src/ade/saves/
